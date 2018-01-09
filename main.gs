@@ -85,11 +85,16 @@ function generateSpreadsheets() {
       // - clear sheet
       sheetObject.clear();
       
+      // - loop through headers
+      for (var j = 0; j < sheetStructure.sheet_headers.length; j++) {
+        headerArray.push(sheetStructure.sheet_headers[j]["jp_name"])
+      }
+      
       // - append header row information
       sheetObject.appendRow(headerArray);
       
       // - set background color of the header row
-      var activeRange = sheetObject.getRange(sheetObject.getLastRow(), 2, 1, headerArray.length - 1)
+      var activeRange = sheetObject.getRange(1, 2, 1, headerArray.length - 1)
       activeRange.setBackgroundRGB(155, 229, 42)
       activeRange.setBorder(true, true, true, true, true, true)
     }

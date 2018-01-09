@@ -84,13 +84,20 @@ function processJira(projectName, object, sheetObject){
       var issueGroupNames = "-";
       
       // - if has an issue key
-      if (issueKey != "-") {
+      if (issueKey != "-" && issueKey) {
         issueDates = processJIRASummaryTime(issueKey);
+        
       }
       
-      // - if has an issue assignee
-      if (issueAssignee != "-") {
+      // - if has issue assignee
+      if (issueAssignee != "-" && issueAssignee) {
         issueGroupNames = processJIRAGroupNames(issueAssignee);
+        
+      }
+      
+      // - if has issue tracker name
+      if (issueTrackerName != "-" && issueTrackerName) {
+        issueTrackerName = processJIRAEpic(issueTrackerName)
         
       }
       
@@ -309,4 +316,21 @@ function processJIRAGroupNames(designatedUser){
   
   // - return total hours
   return objReturn.length == 0 ? "-" : objReturn;
+}
+
+/*
+processJIRAEpic
+- issueID: contains an issue's ID
+*/
+function processJIRAEpic(issueID){
+  // - set total hours
+  var objReturn = ""
+  
+  // - set response
+  var response = postJIRARequest("https://diamondhead.atlassian.net/rest/api/2/issue/" + issueID);
+  var responseIssues = typeof response["fields"] == "undefined" ? {} : response["fields"];
+  var objReturn = typeof responseIssues["customfield_10008"] == 'undefined' ? "-" : responseIssues["customfield_10008"];
+  
+  // - return total hours
+  return objReturn;
 }
