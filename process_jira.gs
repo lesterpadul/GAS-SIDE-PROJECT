@@ -1,3 +1,7 @@
+// - jira container
+var JIRA_GROUP_NAME_CONTAINER = [];
+var JIRA_EPIC_CONTAINER = [];
+
 /*
 processJIRA
 - param.object: contains a json object of the sheet's structure
@@ -5,13 +9,13 @@ processJIRA
 */
 function processJira(projectName, object, sheetObject){
   var hasNext = true;
-  var limit = 25;
+  var limit = 100;
   var offset = 0;
   var totalCount = 0;
   var totalPages = 0;
   var totalSelectedCount = 0;
   var bodyArray = [""];
-  var pageCounter = 2;
+  var pageCounter = 1;
   var lastRow = 1;
   
   // - if has last row value
@@ -29,7 +33,7 @@ function processJira(projectName, object, sheetObject){
   // - setup body content
   while (hasNext) {
     // - setup URL information
-    var url = 'https://diamondhead.atlassian.net/rest/api/2/search?jql=(project=' + object.project_id + ' AND issuetype in standardIssueTypes())&startAt=' + offset + '&maxResults=' + limit;
+    var url = 'https://diamondhead.atlassian.net/rest/api/2/search?jql=(project=' + object.project_id + ' AND issuetype in standardIssueTypes() AND (statusCategory=indeterminate))&startAt=' + offset + '&maxResults=' + limit;
     var response = postJIRARequest(url);
     
     // - if has no contents

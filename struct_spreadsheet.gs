@@ -102,7 +102,7 @@ var structSpreadsheet = {
     {
       "project_title": "SCS",
       "project_code": "scs",
-      "project_status": "inactive",
+      "project_status": "active",
       "api_urls": [
         {
           "type": "jira",

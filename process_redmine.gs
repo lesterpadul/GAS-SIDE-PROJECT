@@ -5,7 +5,7 @@ processRedMine
 */
 function processRedMine(projectName, object, sheetObject){
   var hasNext = true;
-  var limit = 25;
+  var limit = 100;
   var offset = 0;
   var totalCount = 0;
   var totalPages = 0;
