@@ -1,3 +1,5 @@
+var SHEET_SETTINGS_TITLE = "sheet_settings";
+
 //MARK: - send email
 function sendEmail(sheet){
   // - get the sheet's document URL
@@ -64,52 +66,36 @@ function postJIRARequest(url){
 }
 
 //MARK: - update sheet settings
-function updateSheetSettings(obj){
-  // - obj information
-  obj = typeof obj == "undefined" ? {} : obj;
-  
-  // - set the sheet content information
-  var sheetName = typeof obj.sheet_name == "undefined" ? false : obj.sheet_name;
-  var sheetOffset = typeof obj.sheet_offset == "undefined" ? false : obj.sheet_offset;
-  var sheetCode = typeof obj.sheet_code == "undefined" ? false : obj.sheet_code;
-  var sheetLastRow = typeof obj.sheet_last_row == "undefined" ? false : obj.sheet_last_row;
-  var sheetIssueType = typeof obj.sheet_issue_type == "undefined" ? false : obj.sheet_issue_type;
-  var sheetLastPage = typeof obj.sheet_page_counter == "undefined" ? false : obj.sheet_page_counter;
-  var sheetTitle = "sheet_settings";
-  
+function updateSheetSettings(){
   // - try fetching the sheet by name
-  var sheetObject = _SPREADSHEET.getSheetByName(sheetTitle);
+  var sheetObject = _SPREADSHEET.getSheetByName(SHEET_SETTINGS_TITLE);
   
   // - if has no sheet
   if (sheetObject == null) {
-    sheetObject = _SPREADSHEET.insertSheet(sheetTitle);
+    sheetObject = _SPREADSHEET.insertSheet(SHEET_SETTINGS_TITLE);
     
   }
   
   // - clear the sheet object
-  sheetObject.clear()
+  sheetObject.clear()      
   
   // - append header row information
-  sheetObject.appendRow(["sheet_name", _CURRENT_OBJECT.project_title]);
-  sheetObject.appendRow(["sheet_offset", sheetOffset]);
-  sheetObject.appendRow(["sheet_code", _CURRENT_OBJECT.project_code]);
-  sheetObject.appendRow(["sheet_last_row", sheetLastRow]);
-  sheetObject.appendRow(["sheet_issue_type", sheetIssueType]);
-  sheetObject.appendRow(["sheet_last_page", sheetLastPage]);
-  sheetObject.appendRow(["sheet_last_issue_index", _CURRENT_ISSUE_INDEX]);
-  sheetObject.appendRow(["sheet_last_project_index", _CURRENT_PROJECT_INDEX]);
+  sheetObject.appendRow(["PROJECT_NAME", _CURRENT_PROJECT.project_title]);
+  sheetObject.appendRow(["SHEET_PROJECT_INDEX", _CURRENT_PROJECT_INDEX]);
+  sheetObject.appendRow(["SHEET_PROJECT_ISSUE_INDEX", _CURRENT_PROJECT_ISSUE_INDEX]);
+  sheetObject.appendRow(["SHEET_LAST_ROW", _CURRENT_SHEET_LAST_ROW]);
+  sheetObject.appendRow(["SHEET_LAST_OFFSET", _CURRENT_SHEET_LAST_OFFSET]);
+  sheetObject.appendRow(["SHEET_LAST_PAGE", _CURRENT_SHEET_LAST_PAGE]);
 }
 
 //MARK: - clear sheet settings
 function clearSheetSettings(){
-  var sheetTitle = "sheet_settings";
-  
   // - try fetching the sheet by name
-  var sheetObject = _SPREADSHEET.getSheetByName(sheetTitle);
+  var sheetObject = _SPREADSHEET.getSheetByName(SHEET_SETTINGS_TITLE);
   
   // - if has no sheet
   if (sheetObject == null) {
-    sheetObject = _SPREADSHEET.insertSheet(sheetTitle);
+    sheetObject = _SPREADSHEET.insertSheet(SHEET_SETTINGS_TITLE);
     
   }
   
@@ -143,37 +129,84 @@ function parseSheetSettings(){
     var key = sheetObject.getRange(i+1, 1).getValue();
     var value = sheetObject.getRange(i+1, 2).getValue();
     
-    // - sheet offset
-    if (key == "sheet_offset") {
-      _CURRENT_LAST_OFFSET = value;
-      
+    if (key == "SHEET_PROJECT_INDEX") {
+      _CURRENT_PROJECT_INDEX = value
     }
     
-    // - sheet last row
-    if (key == "sheet_last_row") {
-      _CURRENT_LAST_ROW = value;
-      
+    if (key == "SHEET_PROJECT_ISSUE_INDEX") {
+      _CURRENT_PROJECT_ISSUE_INDEX = value
     }
     
-    // - sheet last page
-    if (key == "sheet_last_page") {
-      _CURRENT_LAST_PAGE = value;
-      
+    if (key == "SHEET_LAST_ROW") {
+      _CURRENT_SHEET_LAST_ROW = value
     }
     
-    // - sheet last issue index
-    if (key == "sheet_last_issue_index") {
-      _CURRENT_ISSUE_INDEX = value;
-      
+    if (key == "SHEET_LAST_OFFSET") {
+      _CURRENT_SHEET_LAST_OFFSET = value
     }
     
-    // - sheet last issue index
-    if (key == "sheet_last_project_index") {
-      _CURRENT_PROJECT_INDEX = value;
-      
+    if (key == "SHEET_LAST_PAGE") {
+      _CURRENT_SHEET_LAST_PAGE = value
     }
+    
   }
   
   // - set did parse to true
   _DID_PARSE_SHEET = true
+}
+
+//MARK: - clean the sheet according to the existing content
+function cleanSheetContent(){
+  // - parse content
+  var sheetStructure = structSpreadsheet;
+  var sheetProjects = typeof sheetStructure.sheet_content != 'undefined' ? sheetStructure.sheet_content : [];
+  
+  // - get sheet and row
+  var lastActiveProject = sheetProjects[_CURRENT_PROJECT_INDEX];
+  var lastActiveIssue = lastActiveProject['api_urls'][_CURRENT_PROJECT_ISSUE_INDEX];
+  var lastActiveRow = _CURRENT_SHEET_LAST_ROW;
+  
+  // - try fetching the sheet by name
+  var sheetObject = _SPREADSHEET.getSheetByName(lastActiveProject["project_title"]);
+  
+  // - if has no sheet
+  if (sheetObject == null) {
+    return;
+  }
+  
+  Logger.log("START -> " + sheetObject.getLastRow())
+  
+  // - delete useless rows
+  for (var i = sheetObject.getLastRow(); i > lastActiveRow; i--) {
+    sheetObject.deleteRow(i); 
+  }
+  
+  Logger.log("END -> " + sheetObject.getLastRow())
+}
+
+//MARK: - get value from array by using its key
+function getValueFromArrayByKey(key, array){
+  // - set return object
+  var returnObj = false;
+  
+  // - if array has 0 length
+  if (array.length == 0) {
+    return returnObj;
+  }
+  
+  // - loop through each content
+  for (var i = 0; i < array.length; i++) {
+    // - if either key or value does not exist
+    if (typeof array[i].key == "undefined" || typeof array[i].value == "undefined") {
+      continue;
+    }
+    
+    // - if key matches
+    if (array[i].key == key) {
+      returnObj = array[i];
+    }
+  }
+  
+  // - return object
+  return returnObj;
 }

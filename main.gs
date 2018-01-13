@@ -1,14 +1,32 @@
-//MARK: - constant variables
+// - global spreadsheet variable
 var _SPREADSHEET = null;
+
+// - denotes the current sheet
 var _CURRENT_SHEET = null;
-var _CURRENT_OBJECT = {};
-var _CURRENT_LAST_ROW = false;
-var _CURRENT_LAST_OFFSET = false;
-var _CURRENT_LAST_PAGE = false;
-var _CURRENT_ISSUE_INDEX = false;
-var _CURRENT_PROJECT_INDEX = false;
+
+// - determines if a new sheet was generated
 var _DID_GENERATE_NEW = false;
-var _DID_PARSE_SHEET = false;
+
+// - the index of the current project
+var _CURRENT_PROJECT_INDEX = 0;
+
+// - the index of the current project's issue
+var _CURRENT_PROJECT_ISSUE_INDEX = 0;
+
+// - the current proejct
+var _CURRENT_PROJECT = {};
+
+// - the last row of the current sheet
+var _CURRENT_SHEET_LAST_ROW = 0;
+
+// - the last offset of the sheet
+var _CURRENT_SHEET_LAST_OFFSET = 0;
+
+// - the last page of the sheet
+var _CURRENT_SHEET_LAST_PAGE = 0;
+
+// - catch when the sheet was parsed
+var _DID_PARSE_SHEET = false
 
 //MARK: - generate spreadsheets
 function generateSpreadsheets() {
@@ -19,8 +37,8 @@ function generateSpreadsheets() {
   var files = DriveApp.getFilesByName(sheetTitle);
   var ss = null;
   
-  //STEP 1 - create or reuse sheet
-  // : if has file
+  // - create or reuse sheet
+  // - if has file
   if (files.hasNext()) {
     while (files.hasNext()) {
       ss = SpreadsheetApp.open(files.next());
@@ -36,39 +54,36 @@ function generateSpreadsheets() {
   // - set the spreadsheet globally
   _SPREADSHEET = ss;
   
-  //STEP 2 - parse settings
-  //parseSheetSettings()
+  // - get the last contents
+  parseSheetSettings();
   
-  //STEP 3 - get table structure
+  // - try cleaning the last sheet in preparation for the continue logic
+  cleanSheetContent();
+  
+  // - get table structure
   var sheetStructure = structSpreadsheet;
   var sheetProjects = typeof sheetStructure.sheet_content != 'undefined' ? sheetStructure.sheet_content : [];
   var sheetHeaders = typeof sheetStructure.sheet_headers != 'undefined' ? sheetStructure.sheet_headers : [];
-  var startIndex = 0;
+  var startIndex = _CURRENT_PROJECT_INDEX;
   
-  // - set the last issue index
-  if (_CURRENT_ISSUE_INDEX != false) {
-    startIndex =  _CURRENT_ISSUE_INDEX;
-    _CURRENT_ISSUE_INDEX = false;
-    
-  }
-  
-  //STEP 4 - setup sheet content
+  // - setup sheet content
   for (var i = startIndex; i < sheetProjects.length; i++) {
     // - set project variables
     var project = sheetProjects[i];
     var headerArray = [""];
-    _DID_GENERATE_NEW = false;
-    _CURRENT_ISSUE_INDEX = i
     
     // - if project status is not active, continue
     if (project.project_status != "active") {
-      Logger.log("PROJECT " + project.project_title + " IS NOT ACTIVE");
       continue;
       
     }
     
+    // - set global variable
+    _CURRENT_PROJECT_INDEX = i
+    
     // - try fetching the sheet by name
     var sheetObject = ss.getSheetByName(project.project_title);
+    _DID_GENERATE_NEW = false;
     
     // - if has no sheet
     if (sheetObject == null) {
@@ -81,7 +96,7 @@ function generateSpreadsheets() {
     }
     
     // - if did not parse the sheet settings
-    if (_DID_PARSE_SHEET == false || _DID_GENERATE_NEW == true) {
+    if (_DID_GENERATE_NEW == true) {
       // - clear sheet
       sheetObject.clear();
       
@@ -101,7 +116,7 @@ function generateSpreadsheets() {
     
     // - sheet object
     _CURRENT_SHEET = sheetObject;
-    _CURRENT_OBJECT = project;
+    _CURRENT_PROJECT = project;
     
     // - check if has issues per project
     if (project["api_urls"].length == 0) {
@@ -110,11 +125,19 @@ function generateSpreadsheets() {
     }
     
     // - load issues in project
-    for (var j = 0; j < project["api_urls"].length; j++) {
-      _CURRENT_PROJECT_INDEX = j;
-      processIssues(project.project_title, project["api_urls"][j], sheetObject); 
-      
+    var startProjectIndex = _CURRENT_PROJECT_ISSUE_INDEX != 0 ? _CURRENT_PROJECT_ISSUE_INDEX : 0;
+    for (var j = startProjectIndex; j < project["api_urls"].length; j++) {
+      _CURRENT_PROJECT_ISSUE_INDEX = j;
+      processIssues(project.project_title, project["api_urls"][j], sheetObject);
     }
+    
+    // - TODO: after each loop, clean the settings
+    _CURRENT_PROJECT_ISSUE_INDEX = 0;
+    _CURRENT_SHEET = null;
+    _CURRENT_PROJECT = null;
+    _CURRENT_SHEET_LAST_ROW = 1;
+    _CURRENT_SHEET_LAST_OFFSET = 0;
+    _CURRENT_SHEET_LAST_PAGE = 0;
     
     // - clear all the sheeet settings so far
     if (i == (sheetProjects.length - 1)) {
@@ -139,7 +162,7 @@ function processIssues(projectName, issue, sheetObject){
   
   // - if redmine
   if (issue.type == "redmine") {
-    processRedMine(projectName, issue, sheetObject);
+    //processRedMine(projectName, issue, sheetObject);
     
   }
   

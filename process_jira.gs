@@ -8,39 +8,45 @@ processJIRA
 - param.sheetObject: contains the active sheet
 */
 function processJira(projectName, object, sheetObject){
+  // - will check if has more views aside from the current offset
   var hasNext = true;
-  var limit = 100;
-  var offset = 0;
+  
+  // - set the limit
+  var limit = 5
+  
+  // - set the offset
+  var offset = _CURRENT_SHEET_LAST_OFFSET;
+  
+  // - set the total count
   var totalCount = 0;
+  
+  // - set the total pages
   var totalPages = 0;
-  var totalSelectedCount = 0;
+  
+  // - set the body array
   var bodyArray = [""];
-  var pageCounter = 1;
-  var lastRow = 1;
   
-  // - if has last row value
-  if (_CURRENT_LAST_PAGE != false && _DID_GENERATE_NEW == false) {
-    pageCounter = _CURRENT_LAST_PAGE;
-    _CURRENT_LAST_PAGE = false;
-  }
-  
-  // - if has offset
-  if (_CURRENT_LAST_OFFSET != false && _DID_GENERATE_NEW == false) {
-    offset = _CURRENT_LAST_OFFSET;
-    _CURRENT_LAST_OFFSET = false;
-  }
+  // - set the page counter
+  var pageCounter = _CURRENT_SHEET_LAST_PAGE > 1 ? _CURRENT_SHEET_LAST_PAGE : 1;
   
   // - setup body content
   while (hasNext) {
     // - setup URL information
-    var url = 'https://diamondhead.atlassian.net/rest/api/2/search?jql=(project=' + object.project_id + ' AND issuetype in standardIssueTypes() AND (statusCategory=indeterminate))&startAt=' + offset + '&maxResults=' + limit;
+    var url = 'https://diamondhead.atlassian.net/rest/api/2/search?jql=(project=' + object.project_id + ' AND issuetype in standardIssueTypes() AND statusCategory in (%22In%20Progress%22%2C%22To%20Do%22))&startAt=' + offset + '&maxResults=' + limit;
     var response = postJIRARequest(url);
-    
+        
     // - if has no contents
     if (response["issues"].length == 0) {
       hasNext = false;
       return;
     }
+    
+    Logger.log("================")
+    Logger.log(url)
+    Logger.log("LAST OFFSET " + offset)
+    Logger.log("LAST PAGE " + pageCounter)
+    Logger.log("LENGTH " + response["issues"].length)
+    Logger.log("================")
     
     // - loop through the issues array
     for (var issuesIndex = 0; issuesIndex < response["issues"].length; issuesIndex++) {
@@ -95,13 +101,31 @@ function processJira(projectName, object, sheetObject){
       
       // - if has issue assignee
       if (issueAssignee != "-" && issueAssignee) {
-        issueGroupNames = processJIRAGroupNames(issueAssignee);
+        // - check if the same key already exists in the temporary container
+        var hasGroupValue = getValueFromArrayByKey(issueAssignee, JIRA_GROUP_NAME_CONTAINER);
+        if (typeof hasGroupValue.value != "undefined") {
+          issueGroupNames = hasGroupValue.value;
+          
+        } else {
+          issueGroupNames = processJIRAGroupNames(issueAssignee);
+          JIRA_GROUP_NAME_CONTAINER.push({"key": issueAssignee, "value": issueGroupNames});
+          
+        }
         
       }
       
       // - if has issue tracker name
       if (issueTrackerName != "-" && issueTrackerName) {
-        issueTrackerName = processJIRAEpic(issueTrackerName)
+        // - check if the same key already exists in the temporary container
+        var hasEpicValue = getValueFromArrayByKey(issueTrackerName, JIRA_EPIC_CONTAINER);
+        if (typeof hasEpicValue.value != "undefined") {
+          issueTrackerName = hasEpicValue.value;
+        
+        } else {
+          issueTrackerName = processJIRAEpic(issueTrackerName);
+          JIRA_EPIC_CONTAINER.push({"key": issueTrackerName, "value": issueTrackerName});
+          
+        }
         
       }
       
@@ -180,6 +204,15 @@ function processJira(projectName, object, sheetObject){
     totalPages = Math.ceil(totalCount / limit);
     offset = (pageCounter * limit);
     
+    // - the last row of the current sheet
+    _CURRENT_SHEET_LAST_ROW = sheetObject.getLastRow();
+    
+    // - the last offset of the sheet
+    _CURRENT_SHEET_LAST_OFFSET = offset
+    
+    // - the last page count
+    _CURRENT_SHEET_LAST_PAGE = pageCounter
+    
     // - increment page counter
     pageCounter++;
     
@@ -190,14 +223,7 @@ function processJira(projectName, object, sheetObject){
     }
     
     // - update sheet settings
-    updateSheetSettings({
-      sheet_offset: offset,
-      sheet_last_row: sheetObject.getLastRow(),
-      sheet_issue_type: object.type,
-      sheet_page_counter: pageCounter,
-      sheet_last_issue_offset: 0
-    });
-    
+    updateSheetSettings()
   }
   
 }

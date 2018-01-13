@@ -85,7 +85,7 @@ var structSpreadsheet = {
     {
       "project_title": "DS2.0",
       "project_code": "ds_2",
-      "project_status": "inactive",
+      "project_status": "active",
       "api_urls": [
         {
           "type": "redmine",
@@ -102,7 +102,7 @@ var structSpreadsheet = {
     {
       "project_title": "SCS",
       "project_code": "scs",
-      "project_status": "active",
+      "project_status": "inactive",
       "api_urls": [
         {
           "type": "jira",
@@ -166,7 +166,7 @@ var structSpreadsheet = {
     {
       "project_title": "SNAPLINE",
       "project_code": "snapline",
-      "project_status": "active",
+      "project_status": "inactive",
       "api_urls": [
         {
           "type": "jira",
