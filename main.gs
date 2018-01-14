@@ -4,6 +4,9 @@ var _SPREADSHEET = null;
 // - denotes the current sheet
 var _CURRENT_SHEET = null;
 
+// - denotes the current sheet status
+var _CURRENT_SHEET_STATUS = null;
+
 // - determines if a new sheet was generated
 var _DID_GENERATE_NEW = false;
 
@@ -17,19 +20,21 @@ var _CURRENT_PROJECT_ISSUE_INDEX = 0;
 var _CURRENT_PROJECT = {};
 
 // - the last row of the current sheet
-var _CURRENT_SHEET_LAST_ROW = 0;
+var _CURRENT_SHEET_LAST_ROW = 1;
 
 // - the last offset of the sheet
 var _CURRENT_SHEET_LAST_OFFSET = 0;
 
 // - the last page of the sheet
-var _CURRENT_SHEET_LAST_PAGE = 0;
+var _CURRENT_SHEET_LAST_PAGE = 1;
 
 // - catch when the sheet was parsed
 var _DID_PARSE_SHEET = false
 
-//MARK: - generate spreadsheets
-function generateSpreadsheets() {
+// - get start time
+var _CURRENT_START_TIME = null;
+
+function doGet(){
   // - get sheet title
   var sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(), "GMT+9", "yyyy-MM");
   
@@ -53,12 +58,124 @@ function generateSpreadsheets() {
   
   // - set the spreadsheet globally
   _SPREADSHEET = ss;
+   
+  // - trigger the status
+  checkSheetStatus();
+  
+  // - generate the sheet
+  try {
+    generateSpreadsheets();
+    
+  } catch (e) {
+    Logger.log("caught error")
+  }
+}
+
+//MARK: - check the sheet status
+function checkSheetStatus(){
+  // Deletes all triggers in the current project.
+  var triggers = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < triggers.length; i++) {
+    ScriptApp.deleteTrigger(triggers[i]);
+  }
+  
+  // - try fetching the sheet by name
+  var sheetStatus = _SPREADSHEET.getSheetByName("sheet_process_status");
+  var shouldTrigger = false;
+  var lastStatus = "DONE"; // DONE || ONGOING
+  
+  // - get properties
+  var scriptProperties = PropertiesService.getScriptProperties();
+  
+  // - declare reasonable waiting time
+  var reasonableWaitTime = 7;
+  
+  // - declare dates
+  var startTime = new Date();
+  var endTime = new Date(Date.now() + (reasonableWaitTime * 60 * 1000));
+  
+  // - get the start time
+  _CURRENT_START_TIME = startTime;
+  
+  // - if has no sheet
+  if (sheetStatus == null) {
+    // - insert new sheet
+    sheetStatus = _SPREADSHEET.insertSheet("sheet_process_status");
+    lastStatus = "ONGOING";
+    
+  } else {
+    // - total rows
+    var totalRows = sheetStatus.getLastRow();
+    
+    // - if has no rows
+    if (totalRows != 0 ) {
+      // - if has rows
+      for (var i = 0; i < totalRows; i++) {
+        var key = sheetStatus.getRange(i+1, 1).getValue();
+        var value = sheetStatus.getRange(i+1, 2).getValue();
+        
+        // - parse the status
+        if (key == "STATUS") {
+          lastStatus = value
+          
+        }
+        
+      }
+      
+      // - if the last status is not ongoing or done, set to done
+      if (lastStatus != "ONGOING" || lastStatus != "DONE") {
+        lastStatus = "DONE";
+        
+      }
+      
+    } else {
+      lastStatus = "ONGOING";
+      
+    }
+    
+  }
+  
+  // - set the global sheet status
+  _CURRENT_SHEET_STATUS = sheetStatus
+  
+  // - update the sheet status
+  updateSheetStatus(lastStatus, startTime, endTime);
+  
+  // - create a trigger that will run the script every 5 minutes
+  if (lastStatus == "ONGOING") {
+    ScriptApp.newTrigger("doGet")
+    .timeBased()
+    .at(new Date(endTime))
+    .create();
+    
+  }
+  
+}
+
+//MARK: - update the sheet status
+function updateSheetStatus(newStatus, startTime, endTime){
+  // - clear sheet information
+  _CURRENT_SHEET_STATUS.clear();
+  
+  // - append a status to the sheet
+  _CURRENT_SHEET_STATUS.appendRow(["STATUS", newStatus]);
+  _CURRENT_SHEET_STATUS.appendRow(["LAST_START_TIME", startTime]);
+  _CURRENT_SHEET_STATUS.appendRow(["NEXT_START_TIME", endTime]);
+}
+
+//MARK: - generate spreadsheets
+function generateSpreadsheets() {
+  // - reset the settings for parsing
+  resetSheetSettings();
   
   // - get the last contents
   parseSheetSettings();
   
   // - try cleaning the last sheet in preparation for the continue logic
-  cleanSheetContent();
+  if (_DID_PARSE_SHEET) {
+    cleanSheetContent();
+    
+  }
   
   // - get table structure
   var sheetStructure = structSpreadsheet;
@@ -72,23 +189,17 @@ function generateSpreadsheets() {
     var project = sheetProjects[i];
     var headerArray = [""];
     
-    // - if project status is not active, continue
-    if (project.project_status != "active") {
-      continue;
-      
-    }
-    
     // - set global variable
     _CURRENT_PROJECT_INDEX = i
     
     // - try fetching the sheet by name
-    var sheetObject = ss.getSheetByName(project.project_title);
+    var sheetObject = _SPREADSHEET.getSheetByName(project.project_title);
     _DID_GENERATE_NEW = false;
     
     // - if has no sheet
     if (sheetObject == null) {
       // - insert new sheet
-      sheetObject = ss.insertSheet(project.project_title);
+      sheetObject = _SPREADSHEET.insertSheet(project.project_title);
       
       // - set flag for generating new sheet
       _DID_GENERATE_NEW = true;
@@ -96,7 +207,7 @@ function generateSpreadsheets() {
     }
     
     // - if did not parse the sheet settings
-    if (_DID_GENERATE_NEW == true) {
+    if (_DID_GENERATE_NEW == true || _DID_PARSE_SHEET == false) {
       // - clear sheet
       sheetObject.clear();
       
@@ -112,6 +223,7 @@ function generateSpreadsheets() {
       var activeRange = sheetObject.getRange(1, 2, 1, headerArray.length - 1)
       activeRange.setBackgroundRGB(155, 229, 42)
       activeRange.setBorder(true, true, true, true, true, true)
+      
     }
     
     // - sheet object
@@ -129,22 +241,18 @@ function generateSpreadsheets() {
     for (var j = startProjectIndex; j < project["api_urls"].length; j++) {
       _CURRENT_PROJECT_ISSUE_INDEX = j;
       processIssues(project.project_title, project["api_urls"][j], sheetObject);
+      
+      // - after each loop, clean the settings
+      resetSheetSettings()
+      
     }
-    
-    // - TODO: after each loop, clean the settings
-    _CURRENT_PROJECT_ISSUE_INDEX = 0;
-    _CURRENT_SHEET = null;
-    _CURRENT_PROJECT = null;
-    _CURRENT_SHEET_LAST_ROW = 1;
-    _CURRENT_SHEET_LAST_OFFSET = 0;
-    _CURRENT_SHEET_LAST_PAGE = 0;
     
     // - clear all the sheeet settings so far
     if (i == (sheetProjects.length - 1)) {
       clearSheetSettings()
+      updateSheetStatus("DONE")
       
     }
-    
   }
   
 }
@@ -162,7 +270,7 @@ function processIssues(projectName, issue, sheetObject){
   
   // - if redmine
   if (issue.type == "redmine") {
-    //processRedMine(projectName, issue, sheetObject);
+    processRedMine(projectName, issue, sheetObject);
     
   }
   

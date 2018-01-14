@@ -103,6 +103,24 @@ function clearSheetSettings(){
   sheetObject.clear()
 }
 
+//MARK: - resets the sheet settings
+function resetSheetSettings(){
+  // - the index of the current project's issue
+  _CURRENT_PROJECT_ISSUE_INDEX = 0;
+  
+  // - the last row of the current sheet
+  _CURRENT_SHEET_LAST_ROW = 1;
+  
+  // - the last offset of the sheet
+  _CURRENT_SHEET_LAST_OFFSET = 0;
+  
+  // - the last page of the sheet
+  _CURRENT_SHEET_LAST_PAGE = 1;
+  
+  // - catch when the sheet was parsed
+  _DID_PARSE_SHEET = false
+}
+
 //MARK: - parse sheet settigns
 function parseSheetSettings(){
   var sheetTitle = "sheet_settings";
@@ -138,7 +156,7 @@ function parseSheetSettings(){
     }
     
     if (key == "SHEET_LAST_ROW") {
-      _CURRENT_SHEET_LAST_ROW = value
+      _CURRENT_SHEET_LAST_ROW = value <= 0 ? 1 : value
     }
     
     if (key == "SHEET_LAST_OFFSET") {
@@ -146,7 +164,7 @@ function parseSheetSettings(){
     }
     
     if (key == "SHEET_LAST_PAGE") {
-      _CURRENT_SHEET_LAST_PAGE = value
+      _CURRENT_SHEET_LAST_PAGE = value <= 0 ? 1 : value
     }
     
   }
@@ -169,8 +187,12 @@ function cleanSheetContent(){
   // - try fetching the sheet by name
   var sheetObject = _SPREADSHEET.getSheetByName(lastActiveProject["project_title"]);
   
-  // - if has no sheet
+  Logger.log(sheetObject)
+  
+  // - if has no sheet, reset the sheet settings
   if (sheetObject == null) {
+    Logger.log("NO SHEET DETECTED, START FROM THE BEGINNING")
+    resetSheetSettings()
     return;
   }
   

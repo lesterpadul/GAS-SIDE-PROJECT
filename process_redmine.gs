@@ -4,18 +4,46 @@ processRedMine
 - param.sheetObject: contains the active sheet
 */
 function processRedMine(projectName, object, sheetObject){
+  // - will check if has more views aside from the current offset
   var hasNext = true;
-  var limit = 100;
-  var offset = 0;
+  
+  // - set the limit
+  var limit = 25
+  
+  // - set the offset
+  var offset = _CURRENT_SHEET_LAST_OFFSET;
+  
+  // - set the total count
   var totalCount = 0;
+  
+  // - set the total pages
   var totalPages = 0;
-  var totalSelectedCount = 0;
-  var apiKey = structSpreadsheet.sheet_api_key;
+  
+  // - set the body array
   var bodyArray = [""];
-  var pageCounter = 1;
+  
+  // - set the page counter
+  var pageCounter = _CURRENT_SHEET_LAST_PAGE > 1 ? _CURRENT_SHEET_LAST_PAGE : 1;
+  
+  // - api key used in jira
+  var apiKey = structSpreadsheet.sheet_api_key;
   
   // - setup body content
   while (hasNext) {
+    // - check if passed 4 minutes
+    //var current_date_time = new Date().getTime();
+    //var start_date_time = _CURRENT_START_TIME.getTime();
+    
+    // - get the difference
+    //var difference_in_seconds = Math.floor((current_date_time-start_date_time)/(1000));
+    
+    // - if more than 240 seconds
+    //if (difference_in_seconds >= 240) {
+      //Logger.log("MAX EXECUTION TIME REACHED")
+      //hasNext = false;
+      //return;
+    //}  
+    
     // - url
     var url = "https://dh-redmine.diamondhead.jp/issues.json?key=" + apiKey + "&limit=" + limit + "&offset=" + offset + "&project_id=" + object.project_id;
     var response = fetchJSONData(url);
@@ -137,24 +165,28 @@ function processRedMine(projectName, object, sheetObject){
     // - get pagination information
     totalCount = response["total_count"];
     totalPages = Math.ceil(totalCount / limit);
-    offset = (pageCounter * response["limit"])
+    offset = offset + limit;
+    
+    // - the last row of the current sheet
+    _CURRENT_SHEET_LAST_ROW = sheetObject.getLastRow();
+    
+    // - the last offset of the sheet
+    _CURRENT_SHEET_LAST_OFFSET = offset
+    
+    // - the last page count
+    _CURRENT_SHEET_LAST_PAGE = pageCounter
     
     // - increment page counter
     pageCounter++;
     
     // - if total page, and page counter is the same, set last page
-    if (totalPages == pageCounter) {
+    if (offset > totalCount) {
       hasNext = false;
+        
     }
     
     // - update sheet settings
-    updateSheetSettings({
-      sheet_offset: offset,
-      sheet_last_row: sheetObject.getLastRow(),
-      sheet_issue_type: object.type,
-      sheet_page_counter: pageCounter,
-      sheet_last_issue_offset: 0
-    });
+    updateSheetSettings()
   }
 }
 

@@ -12,7 +12,7 @@ function processJira(projectName, object, sheetObject){
   var hasNext = true;
   
   // - set the limit
-  var limit = 5
+  var limit = 25
   
   // - set the offset
   var offset = _CURRENT_SHEET_LAST_OFFSET;
@@ -34,19 +34,14 @@ function processJira(projectName, object, sheetObject){
     // - setup URL information
     var url = 'https://diamondhead.atlassian.net/rest/api/2/search?jql=(project=' + object.project_id + ' AND issuetype in standardIssueTypes() AND statusCategory in (%22In%20Progress%22%2C%22To%20Do%22))&startAt=' + offset + '&maxResults=' + limit;
     var response = postJIRARequest(url);
-        
+    Logger.log("JIRA " + url)
+    Logger.log("JIRA RESPONSE -> " + response)
+    
     // - if has no contents
     if (response["issues"].length == 0) {
       hasNext = false;
       return;
     }
-    
-    Logger.log("================")
-    Logger.log(url)
-    Logger.log("LAST OFFSET " + offset)
-    Logger.log("LAST PAGE " + pageCounter)
-    Logger.log("LENGTH " + response["issues"].length)
-    Logger.log("================")
     
     // - loop through the issues array
     for (var issuesIndex = 0; issuesIndex < response["issues"].length; issuesIndex++) {
@@ -202,7 +197,7 @@ function processJira(projectName, object, sheetObject){
     // - get pagination information
     totalCount = response["total"];
     totalPages = Math.ceil(totalCount / limit);
-    offset = (pageCounter * limit);
+    offset = offset + limit;
     
     // - the last row of the current sheet
     _CURRENT_SHEET_LAST_ROW = sheetObject.getLastRow();
@@ -210,16 +205,10 @@ function processJira(projectName, object, sheetObject){
     // - the last offset of the sheet
     _CURRENT_SHEET_LAST_OFFSET = offset
     
-    // - the last page count
-    _CURRENT_SHEET_LAST_PAGE = pageCounter
-    
-    // - increment page counter
-    pageCounter++;
-    
     // - if total page, and page counter is the same, set last page
-    if (totalPages <= pageCounter) {
+    if (offset > totalCount) {
       hasNext = false;
-      
+        
     }
     
     // - update sheet settings

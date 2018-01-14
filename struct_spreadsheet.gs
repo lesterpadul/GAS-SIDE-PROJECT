@@ -119,7 +119,7 @@ var structSpreadsheet = {
     {
       "project_title": "アマコン",
       "project_code": "amakon",
-      "project_status": "inactive",
+      "project_status": "active",
       "api_urls": [
         {
           "type": "jira",
@@ -136,7 +136,7 @@ var structSpreadsheet = {
     {
       "project_title": "PVS",
       "project_code": "pvs",
-      "project_status": "inactive",
+      "project_status": "active",
       "api_urls": [
         {
           "type": "jira",
@@ -153,7 +153,7 @@ var structSpreadsheet = {
     {
       "project_title": "MDMAP",
       "project_code": "mdmap",
-      "project_status": "inactive",
+      "project_status": "active",
       "api_urls": [
         {
           "type": "jira",
@@ -166,7 +166,7 @@ var structSpreadsheet = {
     {
       "project_title": "SNAPLINE",
       "project_code": "snapline",
-      "project_status": "inactive",
+      "project_status": "active",
       "api_urls": [
         {
           "type": "jira",
@@ -179,7 +179,7 @@ var structSpreadsheet = {
     {
       "project_title": "社内システム",
       "project_code": "office_system",
-      "project_status": "inactive",
+      "project_status": "active",
       "api_urls": [
         {
           "type": "jira",
