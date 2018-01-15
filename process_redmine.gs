@@ -160,6 +160,11 @@ function processRedMine(projectName, object, sheetObject){
         
       }
       
+      // - if has issue key
+      var getKeyRange = sheetObject.getRange(sheetObject.getLastRow(), 6)
+      var link = "https://dh-redmine.diamondhead.jp/issues/" + currentIssue.id
+      var displayName = currentIssue.id
+      getKeyRange.setFormula("=hyperlink(\""+link+"\";\"" + displayName + "\")");
     }
     
     // - get pagination information

@@ -88,6 +88,37 @@ function updateSheetSettings(){
   sheetObject.appendRow(["SHEET_LAST_PAGE", _CURRENT_SHEET_LAST_PAGE]);
 }
 
+//MARK: - update sheet settings
+function logger(log){
+  // - try fetching the sheet by name
+  var sheetObject = _SPREADSHEET.getSheetByName("sheet_logs");
+  
+  // - if has no sheet
+  if (sheetObject == null) {
+    sheetObject = _SPREADSHEET.insertSheet("sheet_logs");
+    
+  }
+  
+  // - append header row information
+  sheetObject.showSheet();
+  sheetObject.appendRow([new Date(), log]);
+}
+
+//MARK: - hide logger
+function hideLogger(){
+  // - try fetching the sheet by name
+  var sheetObject = _SPREADSHEET.getSheetByName("sheet_logs");
+  
+  // - if has no sheet
+  if (sheetObject == null) {
+    return;
+    
+  }
+  
+  // - append header row information
+  sheetObject.hideSheet();
+}
+
 //MARK: - clear sheet settings
 function clearSheetSettings(){
   // - try fetching the sheet by name
@@ -101,6 +132,7 @@ function clearSheetSettings(){
   
   // - clear the sheet object
   sheetObject.clear()
+  sheetObject.hideSheet()
 }
 
 //MARK: - resets the sheet settings

@@ -61,6 +61,9 @@ function doGet(){
   
   // - set the spreadsheet globally
   _SPREADSHEET = ss;
+  
+  // - debug
+  logger("INITIALIZING doGet")
    
   // - trigger the status
   checkSheetStatus();
@@ -70,8 +73,8 @@ function doGet(){
     generateSpreadsheets();
     
   } catch (e) {
-    Logger.log(e)
-    Logger.log("caught error")
+    logger("CAUGHT ERROR " + e)
+    
   }
 }
 
@@ -80,6 +83,7 @@ function checkSheetStatus(){
   // Deletes all triggers in the current project.
   var triggers = ScriptApp.getProjectTriggers();
   for (var i = 0; i < triggers.length; i++) {
+    logger("DELETING TRIGGER => " + i)
     ScriptApp.deleteTrigger(triggers[i]);
   }
   
@@ -92,21 +96,23 @@ function checkSheetStatus(){
   var scriptProperties = PropertiesService.getScriptProperties();
   
   // - declare reasonable waiting time
-  var reasonableWaitTime = 7;
+  var reasonableWaitTime = 5;
   
   // - declare dates
   var startTime = new Date();
-  var endTime = new Date(Date.now() + (reasonableWaitTime * 60 * 1000));
+  //var endTime = new Date(Date.now() + (reasonableWaitTime * 60 * 1000));
+  var endTime = startTime.setMinutes(startTime.getMinutes() + reasonableWaitTime)
   
   // - get the start time
   _CURRENT_START_TIME = startTime;
-  _CURRENT_END_TIME = endTime;
+  _CURRENT_END_TIME = new Date(endTime);
   
   // - if has no sheet
   if (sheetStatus == null) {
     // - insert new sheet
     sheetStatus = _SPREADSHEET.insertSheet("sheet_process_status");
     lastStatus = "ONGOING";
+    logger("NO SHEET STATUS DETECTED, SETTING TO NULL")
     
   } else {
     // - total rows
@@ -122,6 +128,7 @@ function checkSheetStatus(){
         // - parse the status
         if (key == "STATUS") {
           lastStatus = value
+          logger("PARSING SHEET STATUS")
           
         }
         
@@ -130,11 +137,13 @@ function checkSheetStatus(){
       // - if the last status is not ongoing or done, set to done
       if (lastStatus != "ONGOING" && lastStatus != "DONE") {
         lastStatus = "DONE";
+        logger("SETTING SHEET STATUS TO DONE")
         
       }
       
     } else {
       lastStatus = "ONGOING";
+      logger("SETTING SHEET STATUS TO ONGOING")
       
     }
     
@@ -148,11 +157,11 @@ function checkSheetStatus(){
   
   // - create a trigger that will run the script every 5 minutes
   if (lastStatus == "ONGOING") {
-    Logger.log("will run another script on " + endTime)
+    logger("WILL RUN ANOTHER SCRIPT ON " + new Date(endTime))
     
     ScriptApp.newTrigger("doGet")
     .timeBased()
-    .at(endTime)
+    .at(new Date(endTime))
     .create();
     
   }
@@ -168,6 +177,16 @@ function updateSheetStatus(newStatus){
   _CURRENT_SHEET_STATUS.appendRow(["STATUS", newStatus]);
   _CURRENT_SHEET_STATUS.appendRow(["LAST_START_TIME", _CURRENT_START_TIME]);
   _CURRENT_SHEET_STATUS.appendRow(["NEXT_START_TIME", _CURRENT_END_TIME]);
+  
+  // - if done, hide the sheet
+  if  (newStatus == "DONE") {
+    _CURRENT_SHEET_STATUS.hideSheet()
+    
+  // - else, show the sheet
+  } else {
+    _CURRENT_SHEET_STATUS.showSheet()
+    
+  }
 }
 
 //MARK: - generate spreadsheets
@@ -250,16 +269,17 @@ function generateSpreadsheets() {
       processIssues(project.project_title, project["api_urls"][j], sheetObject);
       
       // - after each loop, clean the settings
-      resetSheetSettings()
+      resetSheetSettings();
       
     }
     
     // - clear all the sheeet settings so far
     if (i == (sheetProjects.length - 1)) {
-      clearSheetSettings()
-      updateSheetStatus("DONE")
-      
+      clearSheetSettings();
+      updateSheetStatus("DONE");
+      hideLogger();
     }
+    
   }
   
 }
