@@ -192,6 +192,14 @@ function processJira(projectName, object, sheetObject){
         activeRange.setBackgroundRGB(204,204,255);
         
       }
+      
+      // - if has issue key
+      if (issueKey != "-") {
+        var getKeyRange = sheetObject.getRange(sheetObject.getLastRow(), 6)
+        var link = "https://diamondhead.atlassian.net/browse/" + issueKey + "?page=com.atlassian.jira.plugin.system.issuetabpanels%3Aworklog-tabpanel"
+        var displayName = issueKey
+        getKeyRange.setFormula("=hyperlink(\""+link+"\";\"" + displayName + "\")");
+      }
     }
     
     // - get pagination information
@@ -319,7 +327,9 @@ function processJIRAGroupNames(designatedUser){
       groupName == "confluence-users" || 
       groupName == "jira-developers" || 
       groupName == "jira-users" || 
-      groupName == "diamondhead-admins"
+      groupName == "diamondhead-admins" ||
+      groupName == "jira-admins" ||
+      groupName == "co-well-admins"
     ) {
       continue;
     }

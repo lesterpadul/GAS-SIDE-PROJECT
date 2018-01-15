@@ -34,6 +34,9 @@ var _DID_PARSE_SHEET = false
 // - get start time
 var _CURRENT_START_TIME = null;
 
+// - get the end time
+var _CURRENT_END_TIME = null;
+
 function doGet(){
   // - get sheet title
   var sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(), "GMT+9", "yyyy-MM");
@@ -67,6 +70,7 @@ function doGet(){
     generateSpreadsheets();
     
   } catch (e) {
+    Logger.log(e)
     Logger.log("caught error")
   }
 }
@@ -96,6 +100,7 @@ function checkSheetStatus(){
   
   // - get the start time
   _CURRENT_START_TIME = startTime;
+  _CURRENT_END_TIME = endTime;
   
   // - if has no sheet
   if (sheetStatus == null) {
@@ -123,7 +128,7 @@ function checkSheetStatus(){
       }
       
       // - if the last status is not ongoing or done, set to done
-      if (lastStatus != "ONGOING" || lastStatus != "DONE") {
+      if (lastStatus != "ONGOING" && lastStatus != "DONE") {
         lastStatus = "DONE";
         
       }
@@ -139,13 +144,15 @@ function checkSheetStatus(){
   _CURRENT_SHEET_STATUS = sheetStatus
   
   // - update the sheet status
-  updateSheetStatus(lastStatus, startTime, endTime);
+  updateSheetStatus(lastStatus);
   
   // - create a trigger that will run the script every 5 minutes
   if (lastStatus == "ONGOING") {
+    Logger.log("will run another script on " + endTime)
+    
     ScriptApp.newTrigger("doGet")
     .timeBased()
-    .at(new Date(endTime))
+    .at(endTime)
     .create();
     
   }
@@ -153,14 +160,14 @@ function checkSheetStatus(){
 }
 
 //MARK: - update the sheet status
-function updateSheetStatus(newStatus, startTime, endTime){
+function updateSheetStatus(newStatus){
   // - clear sheet information
   _CURRENT_SHEET_STATUS.clear();
   
   // - append a status to the sheet
   _CURRENT_SHEET_STATUS.appendRow(["STATUS", newStatus]);
-  _CURRENT_SHEET_STATUS.appendRow(["LAST_START_TIME", startTime]);
-  _CURRENT_SHEET_STATUS.appendRow(["NEXT_START_TIME", endTime]);
+  _CURRENT_SHEET_STATUS.appendRow(["LAST_START_TIME", _CURRENT_START_TIME]);
+  _CURRENT_SHEET_STATUS.appendRow(["NEXT_START_TIME", _CURRENT_END_TIME]);
 }
 
 //MARK: - generate spreadsheets
