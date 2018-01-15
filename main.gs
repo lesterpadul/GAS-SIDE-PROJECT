@@ -37,6 +37,12 @@ var _CURRENT_START_TIME = null;
 // - get the end time
 var _CURRENT_END_TIME = null;
 
+// - get the last start time
+var _LAST_START_TIME = null;
+
+// -set the current status
+var _CURRENT_STATUS = "DONE"
+
 function doGet(){
   // - get sheet title
   var sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(), "GMT+9", "yyyy-MM");
@@ -64,29 +70,43 @@ function doGet(){
   
   // - debug
   logger("INITIALIZING doGet")
-   
+  
   // - trigger the status
   checkSheetStatus();
   
-  // - generate the sheet
-  try {
-    generateSpreadsheets();
+  // - check if 7 minutes has passed
+  if (
+    _LAST_START_TIME != null &&
+    _CURRENT_START_TIME.getTime() > _LAST_START_TIME.getTime() &&
+    ((_CURRENT_START_TIME.getTime() - _LAST_START_TIME.getTime())/1000) >= 420 &&
+    _CURRENT_STATUS == "ONGOING"
+  ) {
+    // - debug
+    logger("RUNNING SCRIPT, LAST START TIME WAS OVER " + (_CURRENT_START_TIME.getTime() - _LAST_START_TIME.getTime())/1000 + " SECONDS AGO")
     
-  } catch (e) {
-    logger("CAUGHT ERROR " + e)
+    // - update the sheet status
+    updateSheetStatus(_CURRENT_STATUS);
+    
+    // - generate the sheet
+    try {
+      generateSpreadsheets();
+      
+    } catch (e) {
+      logger("CAUGHT ERROR " + e)
+      
+    }
+    
+  // - else log for repudiation
+  } else {
+    logger("DOING NOTHING, THE CODE MAY STILL BE RUNNING")
+    logger("LAST EXECUTION TIME WAS " + _LAST_START_TIME)
+    logger("CURRENT EXECUTION TIME IS " + _CURRENT_START_TIME)
     
   }
 }
 
 //MARK: - check the sheet status
 function checkSheetStatus(){
-  // Deletes all triggers in the current project.
-  var triggers = ScriptApp.getProjectTriggers();
-  for (var i = 0; i < triggers.length; i++) {
-    logger("DELETING TRIGGER => " + i)
-    ScriptApp.deleteTrigger(triggers[i]);
-  }
-  
   // - try fetching the sheet by name
   var sheetStatus = _SPREADSHEET.getSheetByName("sheet_process_status");
   var shouldTrigger = false;
@@ -96,16 +116,16 @@ function checkSheetStatus(){
   var scriptProperties = PropertiesService.getScriptProperties();
   
   // - declare reasonable waiting time
-  var reasonableWaitTime = 5;
+  var reasonableWaitTime = 7;
   
   // - declare dates
   var startTime = new Date();
-  //var endTime = new Date(Date.now() + (reasonableWaitTime * 60 * 1000));
-  var endTime = startTime.setMinutes(startTime.getMinutes() + reasonableWaitTime)
+  var endTime = new Date(startTime.getTime() + (reasonableWaitTime * 60 * 1000));
   
   // - get the start time
   _CURRENT_START_TIME = startTime;
   _CURRENT_END_TIME = new Date(endTime);
+  _LAST_START_TIME = null;
   
   // - if has no sheet
   if (sheetStatus == null) {
@@ -132,6 +152,12 @@ function checkSheetStatus(){
           
         }
         
+        // - get the last start time
+        if (key == "LAST_START_TIME") {
+          _LAST_START_TIME = value
+          
+        }
+        
       }
       
       // - if the last status is not ongoing or done, set to done
@@ -152,19 +178,8 @@ function checkSheetStatus(){
   // - set the global sheet status
   _CURRENT_SHEET_STATUS = sheetStatus
   
-  // - update the sheet status
-  updateSheetStatus(lastStatus);
-  
-  // - create a trigger that will run the script every 5 minutes
-  if (lastStatus == "ONGOING") {
-    logger("WILL RUN ANOTHER SCRIPT ON " + new Date(endTime))
-    
-    ScriptApp.newTrigger("doGet")
-    .timeBased()
-    .at(new Date(endTime))
-    .create();
-    
-  }
+  // - set the last status
+  _CURRENT_STATUS = lastStatus
   
 }
 
