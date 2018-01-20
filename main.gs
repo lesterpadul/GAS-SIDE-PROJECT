@@ -74,16 +74,24 @@ function doGet(){
   // - trigger the status
   checkSheetStatus();
   
+  logger(_CURRENT_START_TIME)
+  logger(_LAST_START_TIME)
+  
   // - check if 7 minutes has passed
   if (
+    (_LAST_START_TIME == null ||
+    _CURRENT_START_TIME == null ||
+    _LAST_START_TIME.length == 0 ||
+    _CURRENT_START_TIME.length == 0) ||
+    
+    (_LAST_START_TIME.length != 0 &&
+    _CURRENT_START_TIME.length != 0 &&
     _LAST_START_TIME != null &&
+    _CURRENT_START_TIME != null &&
     _CURRENT_START_TIME.getTime() > _LAST_START_TIME.getTime() &&
     ((_CURRENT_START_TIME.getTime() - _LAST_START_TIME.getTime())/1000) >= 420 &&
-    _CURRENT_STATUS == "ONGOING"
+    _CURRENT_STATUS == "ONGOING")
   ) {
-    // - debug
-    logger("RUNNING SCRIPT, LAST START TIME WAS OVER " + (_CURRENT_START_TIME.getTime() - _LAST_START_TIME.getTime())/1000 + " SECONDS AGO")
-    
     // - update the sheet status
     updateSheetStatus(_CURRENT_STATUS);
     
@@ -293,6 +301,7 @@ function generateSpreadsheets() {
       clearSheetSettings();
       updateSheetStatus("DONE");
       hideLogger();
+      
     }
     
   }

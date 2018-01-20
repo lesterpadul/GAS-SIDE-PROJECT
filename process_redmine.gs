@@ -29,21 +29,7 @@ function processRedMine(projectName, object, sheetObject){
   var apiKey = structSpreadsheet.sheet_api_key;
   
   // - setup body content
-  while (hasNext) {
-    // - check if passed 4 minutes
-    //var current_date_time = new Date().getTime();
-    //var start_date_time = _CURRENT_START_TIME.getTime();
-    
-    // - get the difference
-    //var difference_in_seconds = Math.floor((current_date_time-start_date_time)/(1000));
-    
-    // - if more than 240 seconds
-    //if (difference_in_seconds >= 240) {
-      //Logger.log("MAX EXECUTION TIME REACHED")
-      //hasNext = false;
-      //return;
-    //}  
-    
+  while (hasNext) { 
     // - url
     var url = "https://dh-redmine.diamondhead.jp/issues.json?key=" + apiKey + "&limit=" + limit + "&offset=" + offset + "&project_id=" + object.project_id;
     var response = fetchJSONData(url);
@@ -55,7 +41,7 @@ function processRedMine(projectName, object, sheetObject){
       
       // - set environment variables
       var issueStartDate = typeof currentIssue.start_date == 'undefined' ? null : currentIssue.start_date;
-      var issueDueDate = typeof currentIssue.due_date == 'undefined' ? "-" : currentIssue.due_date;
+      var issueDueDate = typeof currentIssue.due_date == 'undefined' ? null : currentIssue.due_date;
       var issueStatus = typeof currentIssue.due_date != 'undefined' ? "完了" : "仕掛中"
       var issueEstHours = typeof currentIssue.estimated_hours != 'undefined' ? currentIssue.estimated_hours : 0
       var issueCustomName = typeof currentIssue.custom_fields != 'undefined' ? currentIssue.custom_fields[0].name : "-"
@@ -80,7 +66,7 @@ function processRedMine(projectName, object, sheetObject){
       var isParent = typeof currentIssue.parent != 'undefined' ? false : true
       
       // - if startdate is empty, ignore
-      if (issueStartDate == null) {
+      if (issueStartDate == null || issueDueDate == null) {
         continue;
       }
       
@@ -201,18 +187,48 @@ processRedmineIssueSummaryTime
 - param.sheetObject: contains the active sheet
 */
 function processRedmineIssueSummaryTime(issueID, apiKey){
-  var response = fetchJSONData("https://dh-redmine.diamondhead.jp/time_entries.json?limit=100&key=" + apiKey + "&issue_id=" + issueID);
-  var timeEntries = typeof response["time_entries"] == 'undefined' ? [] : response["time_entries"];
+  // - will check if has more views aside from the current offset
+  var hasNext = true;
+  
+  // - set the limit
+  var limit = 100
+  
+  // - set the offset
+  var offset = 0;
+  
+  // - set the total count
+  var totalCount = 0;
+  
+  // - set the total pages
+  var totalPages = 0;
+  
+  // - api key used in jira
+  var apiKey = structSpreadsheet.sheet_api_key;
+  
+  // - get the total hours
   var totalHours = 0;
   
-  // - if has empty time entries, return 0
-  if (timeEntries.length == 0) {
-    return totalHours;
-  }
-  
-  // - loop through time entries
-  for (var i = 0; i < timeEntries.length; i++) {
-    totalHours += typeof timeEntries[i]["hours"] == "undefined" ? 0 : timeEntries[i]["hours"];
+  // - setup body content
+  while (hasNext) { 
+    // - url
+    var response = fetchJSONData("https://dh-redmine.diamondhead.jp/time_entries.json?limit=" + limit + "&key=" + apiKey + "&issue_id=" + issueID + "&offset=" + offset);
+    var timeEntries = typeof response["time_entries"] == 'undefined' ? [] : response["time_entries"];
+    
+    // - loop through time entries
+    for (var i = 0; i < timeEntries.length; i++) {
+      totalHours += typeof timeEntries[i]["hours"] == "undefined" ? 0 : timeEntries[i]["hours"];
+      
+    }
+    
+    // - get pagination information
+    totalCount = response["total_count"];
+    offset = offset + limit;
+    
+    // - if total page, and page counter is the same, set last page
+    if (offset > totalCount) {
+      hasNext = false;
+      
+    }
   }
   
   // - return total hours

@@ -32,11 +32,9 @@ function processJira(projectName, object, sheetObject){
   // - setup body content
   while (hasNext) {
     // - setup URL information
-    var url = 'https://diamondhead.atlassian.net/rest/api/2/search?jql=(project=' + object.project_id + ' AND issuetype in standardIssueTypes() AND statusCategory in (%22In%20Progress%22%2C%22To%20Do%22))&startAt=' + offset + '&maxResults=' + limit;
+    var url = 'https://diamondhead.atlassian.net/rest/api/2/search?jql=(project=' + object.project_id + ' AND issuetype in standardIssueTypes() AND statusCategory in (%22In%20Progress%22%2C%22To%20Do%22) AND resolutiondate is empty)&startAt=' + offset + '&maxResults=' + limit;
     var response = postJIRARequest(url);
-    Logger.log("JIRA " + url)
-    Logger.log("JIRA RESPONSE -> " + response)
-    
+
     // - if has no contents
     if (response["issues"].length == 0) {
       hasNext = false;
@@ -231,53 +229,80 @@ processJIRASummaryTime
 - param.sheetObject: contains the active sheet
 */
 function processJIRASummaryTime(issueID){
+  // - will check if has more views aside from the current offset
+  var hasNext = true;
+  
+  // - set the limit
+  var limit = 100
+  
+  // - set the offset
+  var offset = 0;
+  
+  // - set the total count
+  var totalCount = 0;
+  
+  // - set the total pages
+  var totalPages = 0;
+  
+  // - api key used in jira
+  var apiKey = structSpreadsheet.sheet_api_key;
+  
   // - set total hours
   var objReturn = {startDate: "-", actualHours: "-"};
   var totalSeconds = 0;
   var oldestCreated = false;
   
-  // - set response
-  var response = postJIRARequest("https://diamondhead.atlassian.net/rest/api/2/issue/" + issueID + "/worklog");
-  var workLogs = typeof response["worklogs"] == 'undefined' ? [] : response["worklogs"];
-  
-  // - if has no worklogs, return default
-  if (workLogs.length == 0) {
-    return objReturn;
-  }
-  
-  // - if has no work logs
-  for (var i = 0; i < workLogs.length; i ++) {
-    // - use work log
-    var workLog = workLogs[i];
+  // - setup body content
+  while (hasNext) { 
+    // - url
+    var response = postJIRARequest("https://diamondhead.atlassian.net/rest/api/2/issue/" + issueID + "/worklog?startAt=" + offset + "&maxResults=" + limit);
+    var workLogs = typeof response["worklogs"] == 'undefined' ? [] : response["worklogs"];
     
-    // - get total seconds
-    var totalTimeSpent = typeof workLog.timeSpentSeconds == "undefined" ? "-" : parseInt(workLog.timeSpentSeconds);
-    totalTimeSpent = isNaN(totalTimeSpent) ? 0 : totalTimeSpent;
-    
-    // - increment the total seconds
-    totalSeconds += totalTimeSpent;
-    
-    // - if has no created
-    if (typeof workLog.created == 'undefined') {
-      continue;
+    // - if has no work logs
+    for (var i = 0; i < workLogs.length; i ++) {
+      // - use work log
+      var workLog = workLogs[i];
+      
+      // - get total seconds
+      var totalTimeSpent = typeof workLog.timeSpentSeconds == "undefined" ? "-" : parseInt(workLog.timeSpentSeconds);
+      totalTimeSpent = isNaN(totalTimeSpent) ? 0 : totalTimeSpent;
+      
+      // - increment the total seconds
+      totalSeconds += totalTimeSpent;
+      
+      // - if has no created
+      if (typeof workLog.created == 'undefined') {
+        continue;
+        
+      }
+      
+      // - if first time
+      if (oldestCreated == false) {
+        oldestCreated = workLog.created;
+        continue;
+        
+      }
+      
+      // - get dates
+      var oldCreated = new Date(oldestCreated).valueOf();
+      var newCreated = new Date(workLog.created).valueOf();
+      
+      // - if the new created is older than the previous date
+      if (newCreated <= oldCreated) {
+        oldestCreated = workLog.created;
+        
+      }
       
     }
     
-    // - if first time
-    if (oldestCreated == false) {
-      oldestCreated = workLog.created;
-      continue;
-      
-    }
+    // - get pagination information
+    totalCount = response["total"];
+    offset = offset + limit;
     
-    // - get dates
-    var oldCreated = new Date(oldestCreated).valueOf();
-    var newCreated = new Date(workLog.created).valueOf();
-    
-    // - if the new created is older than the previous date
-    if (newCreated <= oldCreated) {
-      oldestCreated = workLog.created;
-      
+    // - if total page, and page counter is the same, set last page
+    if (offset > totalCount) {
+      hasNext = false;
+        
     }
     
   }

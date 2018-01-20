@@ -100,7 +100,7 @@ function logger(log){
   }
   
   // - append header row information
-  sheetObject.showSheet();
+  sheetObject.hideSheet();
   sheetObject.appendRow([new Date(), log]);
 }
 
