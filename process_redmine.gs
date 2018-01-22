@@ -41,14 +41,14 @@ function processRedMine(projectName, object, sheetObject){
       
       // - set environment variables
       var issueStartDate = typeof currentIssue.start_date == 'undefined' ? null : currentIssue.start_date;
-      var issueDueDate = typeof currentIssue.due_date == 'undefined' ? null : currentIssue.due_date;
-      var issueStatus = typeof currentIssue.due_date != 'undefined' ? "完了" : "仕掛中"
+      var issueDueDate = typeof currentIssue.closed_on == 'undefined' ? null : currentIssue.closed_on;
+      var issueStatus = typeof currentIssue.closed_on != 'undefined' ? "完了" : "仕掛中"
       var issueEstHours = typeof currentIssue.estimated_hours != 'undefined' ? currentIssue.estimated_hours : 0
-      var issueCustomName = typeof currentIssue.custom_fields != 'undefined' ? currentIssue.custom_fields[0].name : "-"
-      var issueCustomValue = typeof currentIssue.custom_fields != 'undefined' ? currentIssue.custom_fields[0].value : "-"
       var issueTrackerName = typeof currentIssue.tracker != "undefined" ? typeof currentIssue.tracker.name != 'undefined' ? currentIssue.tracker.name : "-" : "-"
       var issueAccountItem = "-"
       var issueAssignee = typeof currentAssignee.name == 'undefined' ? "-" : currentAssignee.name;
+      var issueCustomName = typeof currentIssue.custom_fields != 'undefined' ? currentIssue.custom_fields[0].name : "-"
+      var issueCustomValue = typeof currentIssue.custom_fields != 'undefined' ? currentIssue.custom_fields[0].value : "-"
       
       // - set account item
       if (issueTrackerName == "機能開発" && issueTrackerName == "ステータス=完了") {
@@ -66,8 +66,8 @@ function processRedMine(projectName, object, sheetObject){
       var isParent = typeof currentIssue.parent != 'undefined' ? false : true
       
       // - if startdate is empty, ignore
-      if (issueStartDate == null || issueDueDate == null) {
-        continue;
+      if (issueStartDate == null) {
+        issueStatus = "未着手"
       }
       
       // - only include parent issues
@@ -77,7 +77,7 @@ function processRedMine(projectName, object, sheetObject){
       
       // - get time summary
       var issueTimeSummary = processRedmineIssueSummaryTime(currentIssue.id, apiKey);
-       
+      
       // - push elements
       // - project name - プロジェクト
       bodyArray.push(currentIssue.project.name);
@@ -110,12 +110,12 @@ function processRedMine(projectName, object, sheetObject){
       bodyArray.push(issueStatus)
       
       // - estimated hours - 見積工数（h）
-      bodyArray.push(issueEstHours)
+      bodyArray.push(issueTimeSummary.totalHoursParent)
       
       // - actual hours spent, TODO - 実工数(h）
       // - will have to cURL the time entries
       // - https://dh-redmine.diamondhead.jp/time_entries.json?key=<time>&issue_id=<issue>
-      bodyArray.push(issueTimeSummary)
+      bodyArray.push(issueTimeSummary.totalHours)
       
       // - issue estimated cost, TBD - 請求金額
       bodyArray.push("-")
@@ -207,6 +207,7 @@ function processRedmineIssueSummaryTime(issueID, apiKey){
   
   // - get the total hours
   var totalHours = 0;
+  var totalHoursParent = 0;
   
   // - setup body content
   while (hasNext) { 
@@ -216,7 +217,18 @@ function processRedmineIssueSummaryTime(issueID, apiKey){
     
     // - loop through time entries
     for (var i = 0; i < timeEntries.length; i++) {
+      // - get the total hours
       totalHours += typeof timeEntries[i]["hours"] == "undefined" ? 0 : timeEntries[i]["hours"];
+      
+      // - if has issue
+      if (
+        typeof timeEntries[i]["issue"] != "undefined" && 
+        typeof timeEntries[i]["issue"]["id"] != "undefined" &&
+        issueID == timeEntries[i]["issue"]["id"]
+      ) {
+        totalHoursParent += timeEntries[i]["hours"];
+        
+      }
       
     }
     
@@ -232,5 +244,5 @@ function processRedmineIssueSummaryTime(issueID, apiKey){
   }
   
   // - return total hours
-  return totalHours;
+  return {totalHours: totalHours, totalHoursParent: totalHoursParent};
 }

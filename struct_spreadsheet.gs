@@ -97,7 +97,18 @@ var structSpreadsheet = {
         }
       ]
     },
-    
+    // - DS3 sheet
+    {
+      "project_title": "DS3",
+      "project_code": "ds3",
+      "project_status": "inactive",
+      "api_urls": [
+        {
+          "type": "jira",
+          "project_id": "DS3"
+        }
+      ]
+    },
     // - SCS sheet
     {
       "project_title": "SCS",
@@ -106,28 +117,41 @@ var structSpreadsheet = {
       "api_urls": [
         {
           "type": "jira",
-          "project_id": "SCSOP"
-        },
-        {
-          "type": "jira",
           "project_id": "SCS"
         }
       ]
     },
     
-    // - アマコン sheet
+    // - OMS sheet
     {
-      "project_title": "アマコン",
-      "project_code": "amakon",
+      "project_title": "OMS",
+      "project_code": "oms",
       "project_status": "active",
       "api_urls": [
         {
           "type": "jira",
-          "project_id": "LANOPE"
+          "project_id": "ID"
         },
         {
           "type": "jira",
+          "project_id": "KO"
+        }
+      ]
+    },
+        
+    // - LANIKAI sheet
+    {
+      "project_title": "LANIKAI",
+      "project_code": "lanikai",
+      "project_status": "active",
+      "api_urls": [
+        {
+          "type": "jira",
           "project_id": "LAN"
+        },
+        {
+          "type": "jira",
+          "project_id": "LANOPE"
         }
       ]
     },
@@ -140,28 +164,11 @@ var structSpreadsheet = {
       "api_urls": [
         {
           "type": "jira",
-          "project_id": "PVSOPE"
-        },
-        {
-          "type": "jira",
           "project_id": "PVS"
         }
       ]
     },
-    
-    // - MDMAP sheet
-    {
-      "project_title": "MDMAP",
-      "project_code": "mdmap",
-      "project_status": "active",
-      "api_urls": [
-        {
-          "type": "jira",
-          "project_id": "MDMAP"
-        }
-      ]
-    },
-    
+
     // - SNAPLINE sheet
     {
       "project_title": "SNAPLINE",
@@ -175,15 +182,15 @@ var structSpreadsheet = {
       ]
     },
     
-    // - 社内システム sheet
+    // - AICO sheet
     {
-      "project_title": "社内システム",
-      "project_code": "office_system",
+      "project_title": "AICO",
+      "project_code": "aico",
       "project_status": "active",
       "api_urls": [
         {
           "type": "jira",
-          "project_id": "INHOUSE"
+          "project_id": "AICO"
         }
       ]
     }

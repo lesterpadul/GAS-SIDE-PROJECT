@@ -124,6 +124,9 @@ function processJira(projectName, object, sheetObject){
       
       // - issue hours
       var issueStarteDate = typeof issueDates.startDate != 'undefined' ? issueDates.startDate : "-"
+      if (issueStarteDate == "-") {
+        currentIssueStatus = "未着手"
+      }
       
       //MARK: - push elements
       //MARK: - project name - プロジェクト

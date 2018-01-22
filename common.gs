@@ -264,3 +264,32 @@ function getValueFromArrayByKey(key, array){
   // - return object
   return returnObj;
 }
+
+//MARK: - find item inside the array
+function findItemInObject(array, needle, column){
+  logger("COMPARING " + array + " AGAINST " + needle)
+  
+  var exists = false;
+  
+  // - check if array contains anything
+  if (array.length == 0 || array == null) {
+    logger("array is empty")
+    return exists;
+  }
+  
+  // - loop for item
+  for (var i = 0; i < array.length; i++) {
+    logger("COMPARING " + array[i][column] + " AGAINST " + needle)
+    
+    // - if column does not exist, move on to the next loop
+    if (typeof array[i][column] != "undefined") {
+      // - if value exists, return true
+      if (array[i][column] == needle) {
+        exists = true;
+      }
+    }
+  }
+  
+  // - return whatever result
+  return exists;
+}
