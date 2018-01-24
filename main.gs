@@ -43,6 +43,7 @@ var _LAST_START_TIME = null;
 // -set the current status
 var _CURRENT_STATUS = "DONE"
 
+// - doGet function
 function doGet(){
   // - get sheet title
   var sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(), "GMT+9", "yyyy-MM");

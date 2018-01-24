@@ -357,9 +357,27 @@ function processJIRAGroupNames(designatedUser){
       groupName == "jira-users" || 
       groupName == "diamondhead-admins" ||
       groupName == "jira-admins" ||
-      groupName == "co-well-admins"
+      groupName == "co-well-admins" ||
+      groupName == "balsamiq-mockups-editors" ||
+      groupName == "site-admins" ||
+      groupName == "administrators"
     ) {
       continue;
+    }
+    
+    // - if diamondhead
+    if (groupName == "diamondhead") {
+      groupName = "東京"
+    }
+    
+    // - if karabiner
+    if (groupName == "karabiner") {
+      groupName = "カラビナ"
+    }
+    
+    // - if cowell
+    if (groupName == "co-well") {
+      groupName = "コウェル"
     }
     
     // - decide when to add a comma

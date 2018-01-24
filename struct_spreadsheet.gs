@@ -97,6 +97,7 @@ var structSpreadsheet = {
         }
       ]
     },
+
     // - DS3 sheet
     {
       "project_title": "DS3",
@@ -109,6 +110,7 @@ var structSpreadsheet = {
         }
       ]
     },
+    
     // - SCS sheet
     {
       "project_title": "SCS",

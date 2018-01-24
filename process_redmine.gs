@@ -42,6 +42,7 @@ function processRedMine(projectName, object, sheetObject){
       // - set environment variables
       var issueStartDate = typeof currentIssue.start_date == 'undefined' ? null : currentIssue.start_date;
       var issueDueDate = typeof currentIssue.closed_on == 'undefined' ? null : currentIssue.closed_on;
+      issueDueDate = issueDueDate == null ? null : Moment.moment(issueDueDate).format("YYYY-MM-DD");
       var issueStatus = typeof currentIssue.closed_on != 'undefined' ? "完了" : "仕掛中"
       var issueEstHours = typeof currentIssue.estimated_hours != 'undefined' ? currentIssue.estimated_hours : 0
       var issueTrackerName = typeof currentIssue.tracker != "undefined" ? typeof currentIssue.tracker.name != 'undefined' ? currentIssue.tracker.name : "-" : "-"
@@ -49,6 +50,7 @@ function processRedMine(projectName, object, sheetObject){
       var issueAssignee = typeof currentAssignee.name == 'undefined' ? "-" : currentAssignee.name;
       var issueCustomName = typeof currentIssue.custom_fields != 'undefined' ? currentIssue.custom_fields[0].name : "-"
       var issueCustomValue = typeof currentIssue.custom_fields != 'undefined' ? currentIssue.custom_fields[0].value : "-"
+      var brandInformation = findItemInObject(structBrand, issueCustomValue, "identifier");
       
       // - set account item
       if (issueTrackerName == "機能開発" && issueTrackerName == "ステータス=完了") {
@@ -70,10 +72,14 @@ function processRedMine(projectName, object, sheetObject){
         issueStatus = "未着手"
       }
       
-      // - only include parent issues
-      if (!isParent) {
+      // - only include parent issues, and valid brands according ot the struct_brand.gs file
+      if (!isParent || brandInformation == false) {
         continue;
       }
+      
+      // - set the client and brand name
+      var clientName = typeof brandInformation.client_name == "undefined" ? "-" : brandInformation.client_name
+      var brandName = typeof brandInformation.brand_name == "undefined" ? "-" : brandInformation.brand_name
       
       // - get time summary
       var issueTimeSummary = processRedmineIssueSummaryTime(currentIssue.id, apiKey);
@@ -83,10 +89,10 @@ function processRedMine(projectName, object, sheetObject){
       bodyArray.push(currentIssue.project.name);
       
       // - issue custom name, custom_files[0].name - クライアント名
-      bodyArray.push(issueCustomValue);
+      bodyArray.push(clientName);
       
       // - issue custom value, custom_files[0].value - ブランド
-      bodyArray.push(issueCustomName);
+      bodyArray.push(brandName);
       
       // - issue empty value, mall information - モール
       bodyArray.push("-")
@@ -187,61 +193,17 @@ processRedmineIssueSummaryTime
 - param.sheetObject: contains the active sheet
 */
 function processRedmineIssueSummaryTime(issueID, apiKey){
-  // - will check if has more views aside from the current offset
-  var hasNext = true;
-  
-  // - set the limit
-  var limit = 100
-  
-  // - set the offset
-  var offset = 0;
-  
-  // - set the total count
-  var totalCount = 0;
-  
-  // - set the total pages
-  var totalPages = 0;
-  
-  // - api key used in jira
-  var apiKey = structSpreadsheet.sheet_api_key;
-  
   // - get the total hours
   var totalHours = 0;
   var totalHoursParent = 0;
   
-  // - setup body content
-  while (hasNext) { 
-    // - url
-    var response = fetchJSONData("https://dh-redmine.diamondhead.jp/time_entries.json?limit=" + limit + "&key=" + apiKey + "&issue_id=" + issueID + "&offset=" + offset);
-    var timeEntries = typeof response["time_entries"] == 'undefined' ? [] : response["time_entries"];
-    
-    // - loop through time entries
-    for (var i = 0; i < timeEntries.length; i++) {
-      // - get the total hours
-      totalHours += typeof timeEntries[i]["hours"] == "undefined" ? 0 : timeEntries[i]["hours"];
-      
-      // - if has issue
-      if (
-        typeof timeEntries[i]["issue"] != "undefined" && 
-        typeof timeEntries[i]["issue"]["id"] != "undefined" &&
-        issueID == timeEntries[i]["issue"]["id"]
-      ) {
-        totalHoursParent += timeEntries[i]["hours"];
-        
-      }
-      
-    }
-    
-    // - get pagination information
-    totalCount = response["total_count"];
-    offset = offset + limit;
-    
-    // - if total page, and page counter is the same, set last page
-    if (offset > totalCount) {
-      hasNext = false;
-      
-    }
-  }
+  // - url
+  var response = fetchJSONData("https://dh-redmine.diamondhead.jp/issues/" + issueID + ".json?limit=100&key=" + apiKey);
+  var timeEntries = typeof response["issue"] == 'undefined' ? {} : response["issue"];
+  
+  // - get the total hours
+  totalHoursParent = typeof timeEntries.total_estimated_hours == "undefined" ? "-" : timeEntries.total_estimated_hours;
+  totalHours = typeof timeEntries.total_spent_hours == "undefined" ? "-" : timeEntries.total_spent_hours;
   
   // - return total hours
   return {totalHours: totalHours, totalHoursParent: totalHoursParent};
