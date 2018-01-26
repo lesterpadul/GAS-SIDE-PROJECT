@@ -86,6 +86,12 @@ function processJira(projectName, object, sheetObject){
       var issueDates = {};
       var issueGroupNames = "-";
       
+      // - get the labels
+      var issueLabels = typeof currentIssueFields.labels != "undefined" ? currentIssueFields : [];
+      var issueIdentifier = getJIRAIdentifierInfo(issueLabels)
+      
+      Logger.log(issueLabels)
+      
       // - if has an issue key
       if (issueKey != "-" && issueKey) {
         issueDates = processJIRASummaryTime(issueKey);
@@ -135,10 +141,10 @@ function processJira(projectName, object, sheetObject){
       bodyArray.push(projectName);
       
       //MARK: - issue custom name, custom_files[0].name - クライアント名
-      bodyArray.push("-");
+      bodyArray.push(typeof issueIdentifier["client_name"] == "undefined" ? issueIdentifier["client_name"] : "-");
       
       //MARK: - issue custom value, custom_files[0].value - ブランド
-      bodyArray.push("-");
+      bodyArray.push(typeof issueIdentifier["brand_name"] == "undefined" ? issueIdentifier["brand_name"] : "-");
       
       //MARK: - issue empty value, mall information - モール
       bodyArray.push("-");
@@ -221,6 +227,8 @@ function processJira(projectName, object, sheetObject){
       hasNext = false;
         
     }
+    
+    hasNext = false;
     
     // - update sheet settings
     updateSheetSettings()
@@ -407,6 +415,37 @@ function processJIRAEpic(issueID){
   var response = postJIRARequest("https://diamondhead.atlassian.net/rest/api/2/issue/" + issueID);
   var responseIssues = typeof response["fields"] == "undefined" ? {} : response["fields"];
   var objReturn = typeof responseIssues["customfield_10008"] == 'undefined' ? "-" : responseIssues["customfield_10008"];
+  
+  // - return total hours
+  return objReturn;
+}
+
+/*
+getJIRAIdentifierInfo
+- issueID: this will fetch the custom field and value
+*/
+function getJIRAIdentifierInfo(labels){
+  // - object to return
+  var objReturn = {'client_name': null, 'brand_name': null};
+  
+  // - if labels is empty return default
+  if (labels.length == 0) {
+    return objReturn;
+  }
+  
+  // - loop through the labels
+  for (var jiraI = 0; jiraI < labels.length; jiraI++) {
+    // - try to fetch the information
+    var tmpObj = findItemInObject(structBrand, labels[jiraI], "identifier");
+    
+    // - if tmp object gets a hit, return immediately
+    if (tmpObj != false) {
+      // - set the returned values
+      objReturn.client_name = typeof tmpObj.client_name != "undefined" ? tmpObj.client_name : null 
+      objReturn.brand_name = typeof tmpObj.brand_name != "undefined" ? tmpObj.brand_name : null
+      return objReturn
+    }
+  }
   
   // - return total hours
   return objReturn;

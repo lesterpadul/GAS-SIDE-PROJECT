@@ -52,7 +52,7 @@ function doGet(){
   
   // - if first day of the month, and between 12:00 AM and 3:00AM (allowance of 3 hours just in case!)
   if (currentDate != 1 && (currentHour >= 3)) {
-    return false;
+    //return false;
   }
   
   // - get sheet title
@@ -85,8 +85,10 @@ function doGet(){
   // - trigger the status
   checkSheetStatus();
   
-  logger(_CURRENT_START_TIME)
-  logger(_LAST_START_TIME)
+  // - log the time constraints
+  Logger.log(_CURRENT_START_TIME)
+  Logger.log(_LAST_START_TIME)
+  Logger.log(_CURRENT_STATUS)
   
   // - check time constraints
   if (
@@ -137,9 +139,9 @@ function doGet(){
     
   // - else log for repudiation
   } else {
-    logger("DOING NOTHING, THE CODE MAY STILL BE RUNNING")
-    logger("LAST EXECUTION TIME WAS " + _LAST_START_TIME)
-    logger("CURRENT EXECUTION TIME IS " + _CURRENT_START_TIME)
+    Logger.log("DOING NOTHING, THE CODE MAY STILL BE RUNNING")
+    Logger.log("LAST EXECUTION TIME WAS " + _LAST_START_TIME)
+    Logger.log("CURRENT EXECUTION TIME IS " + _CURRENT_START_TIME)
     
   }
 }

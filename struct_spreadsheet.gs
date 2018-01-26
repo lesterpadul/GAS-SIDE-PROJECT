@@ -184,17 +184,17 @@ var structSpreadsheet = {
       ]
     },
     
-    // - AICO sheet
-    {
-      "project_title": "AICO",
-      "project_code": "aico",
-      "project_status": "active",
-      "api_urls": [
-        {
-          "type": "jira",
-          "project_id": "AICO"
-        }
-      ]
+    // - AICO sheet            
+    {            
+      "project_title": "AICO",            
+      "project_code": "aico",            
+      "project_status": "active",            
+      "api_urls": [            
+        {            
+          "type": "jira",            
+          "project_id": "AICO"            
+        }            
+      ]            
     }
   ]
 }
