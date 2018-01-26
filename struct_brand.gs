@@ -3,451 +3,541 @@ var structBrand = [
    {  
       client_name:"AGATHA",
       brand_name:"AGATHA",
+      mall_name:"AGATHA_mall",
       identifier:"agata"
    },
    {  
       client_name:"Cocoonist",
       brand_name:"Cocoonist",
+      mall_name:"_mall",
       identifier:"ccnst"
    },
    {  
       client_name:"GRI",
       brand_name:"GRI",
+      mall_name:"_mall",
       identifier:"gricc"
    },
    {  
       client_name:"INCASE",
       brand_name:"INCASE",
+      mall_name:"_mall",
       identifier:"incas"
    },
    {  
       client_name:"Levi's E-FAMILY SALE",
       brand_name:"Levi's E-FAMILY SALE",
+      mall_name:"_mall",
       identifier:"lsale"
    },
    {  
       client_name:"majesticjapan",
       brand_name:"majesticjapan",
+      mall_name:"_mall",
       identifier:"mjstc"
    },
    {  
       client_name:"PAUL & JOE",
       brand_name:"PAUL & JOE",
+      mall_name:"_mall",
       identifier:"pljoe"
    },
    {  
       client_name:"QUIKSILVER",
       brand_name:"QUIKSILVER",
+      mall_name:"_mall",
       identifier:"quiks"
    },
    {  
       client_name:"SENSE",
       brand_name:"SENSE",
+      mall_name:"_mall",
       identifier:"sense"
    },
    {  
       client_name:"sonoma",
       brand_name:"sonoma",
+      mall_name:"_mall",
       identifier:"sonom"
    },
    {  
       client_name:"Timberland",
       brand_name:"Timberland",
+      mall_name:"_mall",
       identifier:"timbr"
    },
    {  
       client_name:"Tokyo Kawaii life",
       brand_name:"Tokyo Kawaii life",
+      mall_name:"_mall",
       identifier:"lzlsa"
    },
    {  
       client_name:"TOMORROWLAND",
       brand_name:"TOMORROWLAND",
+      mall_name:"TOMORROWLAND_mall",
       identifier:"tmail"
    },
    {  
       client_name:"VICKY",
       brand_name:"VICKY",
+      mall_name:"_mall",
       identifier:"vicky"
    },
    {  
       client_name:"LOOK",
       brand_name:"toryburch",
+      mall_name:"_mall",
       identifier:"toryb"
    },
    {  
       client_name:"Afternoon Tea",
       brand_name:"Afternoon Tea",
+      mall_name:"_mall",
       identifier:"aftea"
    },
    {  
       client_name:"ROSE BUD",
       brand_name:"ROSE BUD",
+      mall_name:"_mall",
       identifier:"rosbd"
    },
    {  
       client_name:"卑弥呼",
       brand_name:"Himiko",
+      mall_name:"_mall",
       identifier:"himik"
    },
    {  
       client_name:"179wg",
       brand_name:"179wg",
+      mall_name:"_mall",
       identifier:"ncolewg"
    },
    {  
       client_name:"ACTUS",
       brand_name:"ACTUS",
+      mall_name:"_mall",
       identifier:"actus"
    },
    {  
       client_name:"amadana",
       brand_name:"amadana",
+      mall_name:"_mall",
       identifier:"amdna"
    },
    {  
       client_name:"ATSURO TAYAMA",
       brand_name:"ATSURO TAYAMA",
+      mall_name:"_mall",
       identifier:"aturo"
    },
    {  
       client_name:"BAREFOOT DREAMS®",
       brand_name:"BAREFOOT DREAMS®",
+      mall_name:"_mall",
       identifier:"bfoot"
    },
    {  
       client_name:"Barneys New York",
       brand_name:"Barneys New York",
+      mall_name:"_mall",
       identifier:"bnyjp"
    },
    {  
       client_name:"Callaway Golf",
       brand_name:"Callaway Golf",
+      mall_name:"_mall",
       identifier:"calla"
    },
    {  
       client_name:"CITRUS NOTES",
       brand_name:"CITRUS NOTES",
+      mall_name:"_mall",
       identifier:"ctrsn"
    },
    {  
       client_name:"CONRAN SHOP",
       brand_name:"CONRAN SHOP",
+      mall_name:"_mall",
       identifier:"coran"
    },
    {  
       client_name:"CUNE BtoC",
       brand_name:"CUNE BtoC",
+      mall_name:"_mall",
       identifier:"cunjp"
    },
    {  
       client_name:"diamondheadプロトタイプ",
       brand_name:"diamondheadプロトタイプ",
+      mall_name:"_mall",
       identifier:"dhead"
    },
    {  
       client_name:"EQUIPMENT",
       brand_name:"EQUIPMENT",
+      mall_name:"_mall",
       identifier:"equip"
    },
    {  
       client_name:"FIVE FOXes",
       brand_name:"FIVE FOXes",
+      mall_name:"_mall",
       identifier:"fvfox"
    },
    {  
       client_name:"giraffe",
       brand_name:"giraffe",
+      mall_name:"_mall",
       identifier:"giraf"
    },
    {  
       client_name:"goa",
       brand_name:"goa",
+      mall_name:"_mall",
       identifier:"goawb"
    },
    {  
       client_name:"H.P.F.MALL",
       brand_name:"H.P.F.MALL",
+      mall_name:"_mall",
       identifier:"hpfml"
    },
    {  
       client_name:"J Lounge",
       brand_name:"BEBE",
+      mall_name:"_mall",
       identifier:"bbeml"
    },
    {  
       client_name:"J Lounge",
       brand_name:"J Lounge",
+      mall_name:"_mall",
       identifier:"javag"
    },
    {  
       client_name:"junkoshimada",
       brand_name:"junkoshimada",
+      mall_name:"_mall",
       identifier:"junko"
    },
    {  
       client_name:"k3",
       brand_name:"k3",
+      mall_name:"_mall",
       identifier:"kthre"
    },
    {  
       client_name:"LDH",
       brand_name:"24karats",
+      mall_name:"_mall",
       identifier:"ldhml"
    },
    {  
       client_name:"LDH",
       brand_name:"EG",
+      mall_name:"_mall",
       identifier:"ldheg"
    },
    {  
       client_name:"LDH",
       brand_name:"Enasoluna",
+      mall_name:"_mall",
       identifier:"enaslna"
    },
    {  
       client_name:"LDH",
       brand_name:"FULL-BK",
+      mall_name:"_mall",
       identifier:"ldhfull"
    },
    {  
       client_name:"LDH",
       brand_name:"GENERATIONSRX",
+      mall_name:"_mall",
       identifier:"generat"
    },
    {  
       client_name:"LDH",
       brand_name:"J.S.B.",
+      mall_name:"_mall",
       identifier:"jsoul"
    },
    {  
       client_name:"LDH",
       brand_name:"PKCZ",
+      mall_name:"_mall",
       identifier:"ldhpkcz"
    },
    {  
       client_name:"LDH",
       brand_name:"SEVEN",
+      mall_name:"_mall",
       identifier:"seven"
    },
    {  
       client_name:"LDH",
       brand_name:"TEG TEG",
+      mall_name:"_mall",
       identifier:"tegtg"
    },
    {  
       client_name:"LDH",
       brand_name:"XX FOUR",
+      mall_name:"_mall",
       identifier:"xxfou"
    },
    {  
       client_name:"LEVI'S",
       brand_name:"LEVI'S",
+      mall_name:"_mall",
       identifier:"elevi"
    },
    {  
       client_name:"LEVI'S",
       brand_name:"LEVI'S E-TRADE",
+      mall_name:"_mall",
       identifier:"lbtob"
    },
    {  
       client_name:"LOOK",
       brand_name:"A.P.C",
+      mall_name:"_mall",
       identifier:"apcjp"
    },
    {  
       client_name:"LOOK",
       brand_name:"Alice+Olivia",
+      mall_name:"_mall",
       identifier:"alice"
    },
    {  
       client_name:"LOOK",
       brand_name:"DENHAM",
+      mall_name:"_mall",
       identifier:"denhm"
    },
    {  
       client_name:"LOOK",
       brand_name:"filage",
+      mall_name:"_mall",
       identifier:"filag"
    },
    {  
       client_name:"LOOK",
       brand_name:"LOOK",
+      mall_name:"_mall",
       identifier:"elook"
    },
    {  
       client_name:"LOOK",
       brand_name:"repetto",
+      mall_name:"_mall",
       identifier:"repet"
    },
    {  
       client_name:"LOOK",
       brand_name:"verabradley",
+      mall_name:"_mall",
       identifier:"verabra"
    },
    {  
       client_name:"LOOK",
       brand_name:"IL BISONTE",
+      mall_name:"_mall",
       identifier:"ilbisnt"
    },
    {  
       client_name:"LOOK",
       brand_name:"Marimekko",
+      mall_name:"_mall",
       identifier:"marimek"
    },
    {  
       client_name:"LOOK",
       brand_name:"ルック公式ファッションブランド通販",
+      mall_name:"_mall",
       identifier:"elook"
    },
    {  
       client_name:"LOOK",
       brand_name:"BENSIMON",
+      mall_name:"_mall",
       identifier:"bnsmn"
    },
    {  
       client_name:"mimi&roger",
       brand_name:"mimi&roger",
+      mall_name:"_mall",
       identifier:"mmrgr"
    },
    {  
       client_name:"NICOLE",
       brand_name:"NICOLE",
+      mall_name:"_mall",
       identifier:"ncole"
    },
    {  
       client_name:"Ouur",
       brand_name:"Ouur",
+      mall_name:"_mall",
       identifier:"ouurs"
    },
    {  
       client_name:"Phillip Lim",
       brand_name:"Phillip Lim",
+      mall_name:"_mall",
       identifier:"phillip"
    },
    {  
       client_name:"Ray Cassin",
       brand_name:"Ray Cassin",
+      mall_name:"_mall",
       identifier:"raycasn"
    },
    {  
       client_name:"Stola",
       brand_name:"Stola",
+      mall_name:"_mall",
       identifier:"stola"
    },
    {  
       client_name:"TOMORROWLAND",
       brand_name:"TOMORROWLAND",
+      mall_name:"TOMORROWLAND_mall",
       identifier:"tmrwl"
    },
    {  
       client_name:"YGエンタテイメント",
       brand_name:"YGエンタテイメント",
+      mall_name:"_mall",
       identifier:"ygent"
    },
    {  
       client_name:"イケガミ",
       brand_name:"Ikegami",
+      mall_name:"_mall",
       identifier:"ikegami"
    },
    {  
       client_name:"カナダグース",
       brand_name:"CANADA GOOSE",
+      mall_name:"_mall",
       identifier:"canadag"
    },
    {  
       client_name:"クロスプラス",
       brand_name:"CrossPlus",
+      mall_name:"_mall",
       identifier:"crssplus"
    },
    {  
       client_name:"コンバーストウキョウ",
       brand_name:"ConversTokyo",
+      mall_name:"_mall",
       identifier:"convs"
    },
    {  
       client_name:"デイシー",
       brand_name:"deicy",
+      mall_name:"_mall",
       identifier:"dxcml"
    },
    {  
       client_name:"テネリ-タ",
       brand_name:"TENERITA",
+      mall_name:"_mall",
       identifier:"tenerit"
    },
    {  
       client_name:"ナイン",
       brand_name:"Nine",
+      mall_name:"_mall",
       identifier:"enine"
    },
    {  
       client_name:"ノ-リ-ズ",
       brand_name:"Nolleys",
+      mall_name:"_mall",
       identifier:"nolleys"
    },
    {  
       client_name:"ビショップ",
       brand_name:"Bshop",
+      mall_name:"_mall",
       identifier:"bshop"
    },
    {  
       client_name:"Benexy",
       brand_name:"BIRKENSTOCK",
+      mall_name:"_mall",
       identifier:"birkn"
    },
    {  
       client_name:"メルロ-ズ",
       brand_name:"Melrose",
+      mall_name:"_mall",
       identifier:"melrose"
    },
    {  
       client_name:"玉屋",
       brand_name:"Tamaya",
+      mall_name:"_mall",
       identifier:"tamay"
    },
    {  
       client_name:"上野商会",
       brand_name:"Ueno",
+      mall_name:"_mall",
       identifier:"uenos"
    },
    {  
       client_name:"福助",
       brand_name:"Fukusuke",
+      mall_name:"_mall",
       identifier:"fkske"
    },
    {  
       client_name:"Mens BIGI",
       brand_name:"Mens BIGI",
+      mall_name:"_mall",
       identifier:"menbigi"
    },
    {  
       client_name:"ルイール",
       brand_name:"ジュエルアディクト",
+      mall_name:"_mall",
       identifier:"luire"
    },
    {  
       client_name:"東京デコレションパ-ク",
       brand_name:"Tokyo Decoration Park",
+      mall_name:"_mall",
       identifier:"tdeco"
    },
    {  
       client_name:"大丸松坂屋",
       brand_name:"クリック＆コレクト",
+      mall_name:"_mall",
       identifier:"candc"
    },
    {  
       client_name:"MAISON & VOYAGE",
       brand_name:"MAISON & VOYAGE",
+      mall_name:"_mall",
       identifier:"misnv"
    },
    {  
       client_name:"P&M",
       brand_name:"P&M",
+      mall_name:"_mall",
       identifier:"pandm"
    },
    {  
       client_name:"バオバオ",
       brand_name:"BAOBAO",
+      mall_name:"_mall",
       identifier:"baoba"
    }
 

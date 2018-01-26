@@ -120,6 +120,8 @@ function doGet(){
       _CURRENT_STATUS == "DONE"
     )
   ) {
+    Logger.log("RUNNING CODE");
+    
     // - if the current status is 'done', move to 'ongoing'
     if (_CURRENT_STATUS == "DONE") {
       _CURRENT_STATUS = "ONGOING"

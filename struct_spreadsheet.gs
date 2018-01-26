@@ -81,20 +81,24 @@ var structSpreadsheet = {
   
   // - spreadsheet sheets
   "sheet_content": [
-    	// - DS2 sheet
+    // - DS2 sheet
     {
       "project_title": "DS2.0",
       "project_code": "ds_2",
       "project_status": "active",
       "api_urls": [
         {
+          "type": "redmine",
+          "project_id": 20
+        },
+        {
           "type": "jira",
           "project_id": "DS2"
         }
       ]
     },
-    
-	// - DS3 sheet
+
+    // - DS3 sheet
     {
       "project_title": "DS3",
       "project_code": "ds3",

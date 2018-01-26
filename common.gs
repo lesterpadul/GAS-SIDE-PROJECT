@@ -50,8 +50,13 @@ function postJIRARequest(url){
     }
   };
   
+  Logger.log("POSTING")
+  Logger.log(url)
+  
   // - get response
   var response = UrlFetchApp.fetch(url, options);
+  
+  Logger.log(response)
   
   // - initialise the global variables
   var jsonResponse = {};
@@ -59,7 +64,10 @@ function postJIRARequest(url){
   // - try parsing the json information
   try {
     jsonResponse = JSON.parse(response);
-  } catch (ex) {}
+  } catch (ex) {
+    Logger.log(ex)
+    
+  }
   
   // - return response
   return jsonResponse;

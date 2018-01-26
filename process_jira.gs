@@ -32,9 +32,19 @@ function processJira(projectName, object, sheetObject){
   // - setup body content
   while (hasNext) {
     // - setup URL information
-    var url = 'https://diamondhead.atlassian.net/rest/api/2/search?jql=(project=' + object.project_id + ' AND issuetype in standardIssueTypes() AND statusCategory in (%22In%20Progress%22%2C%22To%20Do%22) AND resolutiondate is empty)&startAt=' + offset + '&maxResults=' + limit;
+    var url = "https://diamondhead.atlassian.net/rest/api/2/search?jql=";
+    
+    // - encode the JQL params
+    var urlParams = "(project=" + object.project_id + " AND issuetype in standardIssueTypes() AND "
+    urlParams += "((statusCategory in ('In Progress', 'To Do')) OR "
+    urlParams += "(statusCategory in ('Done') AND resolutiondate >= startOfMonth(-1) AND resolutiondate <= endOfMonth(-1))))"
+    
+    // - append the encoded uri
+    url += encodeURIComponent(urlParams) + "&startAt=" + offset + "&maxResults=" + limit
+    
+    // - set the response
     var response = postJIRARequest(url);
-
+    
     // - if has no contents
     if (response["issues"].length == 0) {
       hasNext = false;
@@ -55,12 +65,11 @@ function processJira(projectName, object, sheetObject){
       issueDueDate = issueDueDate == "-" ? "-" : Moment.moment(issueDueDate).format("YYYY-MM-DD");
       
       // - get issue resolution date
-      var issueResolutionDate = typeof currentIssueFields.resolutiondate == 'undefined' ? "-" : currentIssueFields.resolutiondate;
-      issueResolutionDate = !issueResolutionDate ? "-" : issueResolutionDate;
+      var issueResolutionDate = typeof currentIssueFields.resolutiondate == 'undefined' || currentIssueFields.resolutiondate == null ? "-" : currentIssueFields.resolutiondate;
       issueResolutionDate = issueResolutionDate == "-" ? "-" : Moment.moment(currentIssueFields.resolutiondate).format("YYYY-MM-DD");
       
       // - set the issue status
-      var issueStatus = typeof issueResolutionDate != '-' ? "完了" : "仕掛中"
+      var issueStatus = issueResolutionDate != '-' ? "完了" : "仕掛中"
       
       // - get issue assignee
       var issueAssignee = typeof currentIssueAssignee.name == 'undefined' ? "-" : currentIssueAssignee.name;
@@ -89,9 +98,6 @@ function processJira(projectName, object, sheetObject){
       // - get the labels
       var issueLabels = typeof currentIssueFields.labels != "undefined" ? currentIssueFields.labels : [];
       var issueIdentifier = getJIRAIdentifierInfo(issueLabels)
-      
-      Logger.log(issueLabels)
-      Logger.log(issueIdentifier)
       
       // - if has an issue key
       if (issueKey != "-" && issueKey) {
@@ -425,7 +431,7 @@ getJIRAIdentifierInfo
 */
 function getJIRAIdentifierInfo(labels){
   // - object to return
-  var objReturn = {'client_name': null, 'brand_name': null};
+  var objReturn = {'client_name': "-", 'brand_name': "-", 'mall_name': "-"};
   
   // - if labels is empty return default
   if (labels.length == 0) {
@@ -440,8 +446,9 @@ function getJIRAIdentifierInfo(labels){
     // - if tmp object gets a hit, return immediately
     if (tmpObj != false) {
       // - set the returned values
-      objReturn.client_name = typeof tmpObj.client_name != "undefined" ? tmpObj.client_name : null 
-      objReturn.brand_name = typeof tmpObj.brand_name != "undefined" ? tmpObj.brand_name : null
+      objReturn.client_name = typeof tmpObj.client_name != "undefined" ? tmpObj.client_name : "-" 
+      objReturn.brand_name = typeof tmpObj.brand_name != "undefined" ? tmpObj.brand_name : "-"
+      objReturn.mall_name = typeof tmpObj.mall_name != "undefined" ? tmpObj.mall_name : "-"
       return objReturn
     }
   }
