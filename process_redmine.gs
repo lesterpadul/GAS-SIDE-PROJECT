@@ -31,7 +31,7 @@ function processRedMine(projectName, object, sheetObject){
   // - setup body content
   while (hasNext) { 
     // - url
-    var url = "https://dh-redmine.diamondhead.jp/issues.json?key=" + apiKey + "&limit=" + limit + "&offset=" + offset + "&project_id=" + object.project_id;
+    var url = "https://dh-redmine.diamondhead.jp/issues.json?key=" + apiKey + "&limit=" + limit + "&offset=" + offset + "&project_id=" + object.project_id + "&status_id=*";
     var response = fetchJSONData(url);
     
     // - loop through the issues array
@@ -72,16 +72,21 @@ function processRedMine(projectName, object, sheetObject){
         continue;
       }
       
-      // - get the start of last month
-      var lastMonthEstimatedStart = Moment.moment(new Date()).subtract(1, 'months').startOf('month').unix()
-      var lastMonthEstimatedEnd = Moment.moment(new Date()).subtract(1, 'months').endOf('month').unix()
-      
       // - translate to unix
-      var currentIssueDueDate = Moment.moment(issueDueDate).unix()
-      
-      // - if less than last month
-      if (currentIssueDueDate < lastMonthEstimatedStart || currentIssueDueDate > lastMonthEstimatedEnd) {
-        continue;
+      if (issueDueDate != null) {
+        // - get the start of last month
+        var lastMonthEstimatedStart = Moment.moment(new Date()).subtract(1, 'months').startOf('month').unix()
+        var lastMonthEstimatedEnd = Moment.moment(new Date()).subtract(1, 'months').endOf('month').unix()
+        
+        // - issue due date
+        var currentIssueDueDate = Moment.moment(issueDueDate).unix()
+        
+        // - if less than last month
+        if (currentIssueDueDate < lastMonthEstimatedStart || currentIssueDueDate > lastMonthEstimatedEnd) {
+          continue;
+        }
+      } else {
+        issueDueDate = "-"
       }
       
       // - set the client and brand name

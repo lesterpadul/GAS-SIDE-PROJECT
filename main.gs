@@ -47,11 +47,10 @@ var _CURRENT_STATUS = "DONE"
 function doGet(){
   // - get current dates
   var newTime = new Date();
-  var currentDate = newTime.getDate()
   var currentHour = newTime.getHours();
   
   // - if first day of the month, and between 12:00 AM and 3:00AM (allowance of 3 hours just in case!)
-  if (currentDate != 1 && (currentHour >= 3)) {
+  if ((currentHour >= 3)) {
     //return false;
   }
   
