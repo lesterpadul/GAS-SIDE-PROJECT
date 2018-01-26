@@ -87,10 +87,11 @@ function processJira(projectName, object, sheetObject){
       var issueGroupNames = "-";
       
       // - get the labels
-      var issueLabels = typeof currentIssueFields.labels != "undefined" ? currentIssueFields : [];
+      var issueLabels = typeof currentIssueFields.labels != "undefined" ? currentIssueFields.labels : [];
       var issueIdentifier = getJIRAIdentifierInfo(issueLabels)
       
       Logger.log(issueLabels)
+      Logger.log(issueIdentifier)
       
       // - if has an issue key
       if (issueKey != "-" && issueKey) {
@@ -141,10 +142,10 @@ function processJira(projectName, object, sheetObject){
       bodyArray.push(projectName);
       
       //MARK: - issue custom name, custom_files[0].name - クライアント名
-      bodyArray.push(typeof issueIdentifier["client_name"] == "undefined" ? issueIdentifier["client_name"] : "-");
+      bodyArray.push(typeof issueIdentifier["client_name"] == "undefined" ? "-" : issueIdentifier["client_name"]);
       
       //MARK: - issue custom value, custom_files[0].value - ブランド
-      bodyArray.push(typeof issueIdentifier["brand_name"] == "undefined" ? issueIdentifier["brand_name"] : "-");
+      bodyArray.push(typeof issueIdentifier["brand_name"] == "undefined" ? "-" : issueIdentifier["brand_name"]);
       
       //MARK: - issue empty value, mall information - モール
       bodyArray.push("-");

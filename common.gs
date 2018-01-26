@@ -219,8 +219,6 @@ function cleanSheetContent(){
   // - try fetching the sheet by name
   var sheetObject = _SPREADSHEET.getSheetByName(lastActiveProject["project_title"]);
   
-  Logger.log(sheetObject)
-  
   // - if has no sheet, reset the sheet settings
   if (sheetObject == null) {
     Logger.log("NO SHEET DETECTED, START FROM THE BEGINNING")
@@ -228,14 +226,10 @@ function cleanSheetContent(){
     return;
   }
   
-  Logger.log("START -> " + sheetObject.getLastRow())
-  
   // - delete useless rows
   for (var i = sheetObject.getLastRow(); i > lastActiveRow; i--) {
     sheetObject.deleteRow(i); 
   }
-  
-  Logger.log("END -> " + sheetObject.getLastRow())
 }
 
 //MARK: - get value from array by using its key

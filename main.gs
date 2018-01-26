@@ -80,7 +80,7 @@ function doGet(){
   _SPREADSHEET = ss;
   
   // - debug
-  logger("INITIALIZING doGet")
+  Logger.log("INITIALIZING doGet")
   
   // - trigger the status
   checkSheetStatus();
