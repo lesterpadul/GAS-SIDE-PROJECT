@@ -6,7 +6,7 @@ function sendEmail(sheet){
   var url = sheet.getUrl();
 
   // - send the email
-  var email = "padullester@gmail.com";
+  var email = _ADMIN_MAIL;
 
   // - Get the name of the document to use as an email subject line.
   var subject = sheet.getName() + "のURLはこちらになります";

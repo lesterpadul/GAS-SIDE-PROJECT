@@ -43,6 +43,9 @@ var _LAST_START_TIME = null;
 // -set the current status
 var _CURRENT_STATUS = "DONE"
 
+// - access mail
+var _ADMIN_MAIL = "killkue@gmail.com"
+
 // - doGet function
 function doGet(){
   // - get current dates
@@ -72,6 +75,10 @@ function doGet(){
   // - if has no file, create a new one
   } else {
     ss = SpreadsheetApp.create(sheetTitle);
+    ss.addEditor(_ADMIN_MAIL)
+    
+    // - send email
+    sendEmail(ss)
     
   }
   
