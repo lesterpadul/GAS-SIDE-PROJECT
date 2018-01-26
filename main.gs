@@ -45,6 +45,16 @@ var _CURRENT_STATUS = "DONE"
 
 // - doGet function
 function doGet(){
+  // - get current dates
+  var newTime = new Date();
+  var currentDate = newTime.getDate()
+  var currentHour = newTime.getHours();
+  
+  // - if first day of the month, and between 12:00 AM and 3:00AM (allowance of 3 hours just in case!)
+  if (currentDate != 1 && (currentHour >= 3)) {
+    return false;
+  }
+  
   // - get sheet title
   var sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(), "GMT+9", "yyyy-MM");
   
@@ -78,21 +88,41 @@ function doGet(){
   logger(_CURRENT_START_TIME)
   logger(_LAST_START_TIME)
   
-  // - check if 7 minutes has passed
+  // - check time constraints
   if (
+    // - if sheet settings is not present
     (_LAST_START_TIME == null ||
     _CURRENT_START_TIME == null ||
     _LAST_START_TIME.length == 0 ||
     _CURRENT_START_TIME.length == 0) ||
     
-    (_LAST_START_TIME.length != 0 &&
-    _CURRENT_START_TIME.length != 0 &&
-    _LAST_START_TIME != null &&
-    _CURRENT_START_TIME != null &&
-    _CURRENT_START_TIME.getTime() > _LAST_START_TIME.getTime() &&
-    ((_CURRENT_START_TIME.getTime() - _LAST_START_TIME.getTime())/1000) >= 420 &&
-    _CURRENT_STATUS == "ONGOING")
+    // - if status is still ongoing, run after 7 minutes
+    (
+      _LAST_START_TIME.length != 0 &&
+      _CURRENT_START_TIME.length != 0 &&
+      _LAST_START_TIME != null &&
+      _CURRENT_START_TIME != null &&
+      _CURRENT_START_TIME.getTime() > _LAST_START_TIME.getTime() &&
+      ((_CURRENT_START_TIME.getTime() - _LAST_START_TIME.getTime())/1000) >= 420 &&
+      _CURRENT_STATUS == "ONGOING"
+    ) ||
+    
+    // - if status is done, rerun after 2 hours
+    (
+      _LAST_START_TIME.length != 0 &&
+      _CURRENT_START_TIME.length != 0 &&
+      _LAST_START_TIME != null &&
+      _CURRENT_START_TIME != null &&
+      _CURRENT_START_TIME.getTime() > _LAST_START_TIME.getTime() &&
+      ((_CURRENT_START_TIME.getTime() - _LAST_START_TIME.getTime())/1000) >= 420 &&
+      _CURRENT_STATUS == "DONE"
+    )
   ) {
+    // - if the current status is 'done', move to 'ongoing'
+    if (_CURRENT_STATUS == "DONE") {
+      _CURRENT_STATUS = "ONGOING"
+    }
+    
     // - update the sheet status
     updateSheetStatus(_CURRENT_STATUS);
     

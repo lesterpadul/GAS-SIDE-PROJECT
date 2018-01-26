@@ -54,13 +54,13 @@ function processJira(projectName, object, sheetObject){
       issueDueDate = !issueDueDate ? "-" : issueDueDate;
       issueDueDate = issueDueDate == "-" ? "-" : Moment.moment(issueDueDate).format("YYYY-MM-DD");
       
-      // - get issue status
-      var issueStatus = typeof currentIssueStatus.name == 'undefined' ? "-" : currentIssueStatus.name;
-      
       // - get issue resolution date
       var issueResolutionDate = typeof currentIssueFields.resolutiondate == 'undefined' ? "-" : currentIssueFields.resolutiondate;
       issueResolutionDate = !issueResolutionDate ? "-" : issueResolutionDate;
       issueResolutionDate = issueResolutionDate == "-" ? "-" : Moment.moment(currentIssueFields.resolutiondate).format("YYYY-MM-DD");
+      
+      // - set the issue status
+      var issueStatus = typeof issueResolutionDate != '-' ? "完了" : "仕掛中"
       
       // - get issue assignee
       var issueAssignee = typeof currentIssueAssignee.name == 'undefined' ? "-" : currentIssueAssignee.name;
@@ -122,10 +122,12 @@ function processJira(projectName, object, sheetObject){
         
       }
       
-      // - issue hours
-      var issueStarteDate = typeof issueDates.startDate != 'undefined' ? issueDates.startDate : "-"
-      if (issueStarteDate == "-") {
-        currentIssueStatus = "未着手"
+      // - get the issue start date
+      var issueStartDate = typeof issueDates.startDate != 'undefined' ? issueDates.startDate : "-"
+      
+      // - if issue start date is empty, don't continue
+      if (issueStartDate == "-") {
+        continue;
       }
       
       //MARK: - push elements
@@ -151,7 +153,7 @@ function processJira(projectName, object, sheetObject){
       bodyArray.push(issueTrackerName);
       
       //MARK: - issue start date - 着手日
-      bodyArray.push(issueStarteDate);
+      bodyArray.push(issueStartDate);
       
       //MARK: - issue due date - リリース日
       bodyArray.push(issueResolutionDate);

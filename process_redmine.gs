@@ -67,13 +67,8 @@ function processRedMine(projectName, object, sheetObject){
       // - if has parent issue
       var isParent = typeof currentIssue.parent != 'undefined' ? false : true
       
-      // - if startdate is empty, ignore
-      if (issueStartDate == null) {
-        issueStatus = "未着手"
-      }
-      
       // - only include parent issues, and valid brands according ot the struct_brand.gs file
-      if (!isParent || brandInformation == false) {
+      if (!isParent || brandInformation == false || issueStartDate == null) {
         continue;
       }
       
