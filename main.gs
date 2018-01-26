@@ -108,14 +108,14 @@ function doGet(){
       _CURRENT_STATUS == "ONGOING"
     ) ||
     
-    // - if status is done, rerun after 2 hours
+    // - if status is done, rerun after 3 hours
     (
       _LAST_START_TIME.length != 0 &&
       _CURRENT_START_TIME.length != 0 &&
       _LAST_START_TIME != null &&
       _CURRENT_START_TIME != null &&
       _CURRENT_START_TIME.getTime() > _LAST_START_TIME.getTime() &&
-      ((_CURRENT_START_TIME.getTime() - _LAST_START_TIME.getTime())/1000) >= 420 &&
+      ((_CURRENT_START_TIME.getTime() - _LAST_START_TIME.getTime())/1000) >= 10800 &&
       _CURRENT_STATUS == "DONE"
     )
   ) {
@@ -335,7 +335,6 @@ function generateSpreadsheets() {
       clearSheetSettings();
       updateSheetStatus("DONE");
       hideLogger();
-      
     }
     
   }

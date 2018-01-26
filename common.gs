@@ -9,10 +9,10 @@ function sendEmail(sheet){
   var email = "padullester@gmail.com";
 
   // - Get the name of the document to use as an email subject line.
-  var subject = sheet.getName();
-
+  var subject = sheet.getName() + "のURLはこちらになります";
+  
   // - Append a new string to the "url" variable to use as an email body.
-  var body = 'Link to your doc: ' + url;
+  var body = 'URL: ' + url;
   
   // - Send yourself an email with a link to the document.
   GmailApp.sendEmail(email, subject, body);
