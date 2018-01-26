@@ -228,8 +228,6 @@ function processJira(projectName, object, sheetObject){
         
     }
     
-    hasNext = false;
-    
     // - update sheet settings
     updateSheetSettings()
   }
