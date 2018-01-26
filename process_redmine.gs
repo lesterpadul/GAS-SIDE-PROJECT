@@ -75,6 +75,7 @@ function processRedMine(projectName, object, sheetObject){
       // - set the client and brand name
       var clientName = typeof brandInformation.client_name == "undefined" ? "-" : brandInformation.client_name
       var brandName = typeof brandInformation.brand_name == "undefined" ? "-" : brandInformation.brand_name
+      var mallName = typeof brandInformation.mall_name == "undefined" ? "-" : brandInformation.mall_name
       
       // - get time summary
       var issueTimeSummary = processRedmineIssueSummaryTime(currentIssue.id, apiKey);
@@ -90,7 +91,7 @@ function processRedMine(projectName, object, sheetObject){
       bodyArray.push(brandName);
       
       // - issue empty value, mall information - モール
-      bodyArray.push("-")
+      bodyArray.push(mallName)
       
       // - issue id - ID
       bodyArray.push(currentIssue.id)

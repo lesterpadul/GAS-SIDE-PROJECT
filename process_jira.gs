@@ -148,7 +148,7 @@ function processJira(projectName, object, sheetObject){
       bodyArray.push(typeof issueIdentifier["brand_name"] == "undefined" ? "-" : issueIdentifier["brand_name"]);
       
       //MARK: - issue empty value, mall information - モール
-      bodyArray.push("-");
+      bodyArray.push(typeof issueIdentifier["mall_name"] == "undefined" ? "-" : issueIdentifier["mall_name"]);
       
       //MARK: - issue id - ID
       bodyArray.push(issueKey);
