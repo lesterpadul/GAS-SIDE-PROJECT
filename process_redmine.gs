@@ -72,6 +72,18 @@ function processRedMine(projectName, object, sheetObject){
         continue;
       }
       
+      // - get the start of last month
+      var lastMonthEstimatedStart = Moment.moment(new Date()).subtract(1, 'months').startOf('month').unix()
+      var lastMonthEstimatedEnd = Moment.moment(new Date()).subtract(1, 'months').endOf('month').unix()
+      
+      // - translate to unix
+      var currentIssueDueDate = Moment.moment(issueDueDate).unix()
+      
+      // - if less than last month
+      if (currentIssueDueDate < lastMonthEstimatedStart || currentIssueDueDate > lastMonthEstimatedEnd) {
+        continue;
+      }
+      
       // - set the client and brand name
       var clientName = typeof brandInformation.client_name == "undefined" ? "-" : brandInformation.client_name
       var brandName = typeof brandInformation.brand_name == "undefined" ? "-" : brandInformation.brand_name
