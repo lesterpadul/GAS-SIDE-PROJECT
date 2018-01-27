@@ -53,8 +53,8 @@ function doGet(){
   var currentHour = newTime.getHours();
   
   // - if first day of the month, and between 12:00 AM and 3:00AM (allowance of 3 hours just in case!)
-  if ((currentHour >= 3)) {
-    //return false;
+  if ((currentHour >= 5)) {
+     return false;
   }
   
   // - get sheet title
@@ -122,7 +122,7 @@ function doGet(){
       _LAST_START_TIME != null &&
       _CURRENT_START_TIME != null &&
       _CURRENT_START_TIME.getTime() > _LAST_START_TIME.getTime() &&
-      ((_CURRENT_START_TIME.getTime() - _LAST_START_TIME.getTime())/1000) >= 10800 &&
+      ((_CURRENT_START_TIME.getTime() - _LAST_START_TIME.getTime())/1000) >= 18000 &&
       _CURRENT_STATUS == "DONE"
     )
   ) {
