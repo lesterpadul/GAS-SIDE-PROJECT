@@ -54,7 +54,7 @@ function doGet(){
   
   // - if first day of the month, and between 12:00 AM and 3:00AM (allowance of 3 hours just in case!)
   if ((currentHour >= 5)) {
-     return false;
+     //return false;
   }
   
   // - get sheet title
@@ -63,6 +63,7 @@ function doGet(){
   // - get drive
   var files = DriveApp.getFilesByName(sheetTitle);
   var ss = null;
+  var didCreate = false;
   
   // - create or reuse sheet
   // - if has file
@@ -74,12 +75,17 @@ function doGet(){
   
   // - if has no file, create a new one
   } else {
+    // - create new sheet
     ss = SpreadsheetApp.create(sheetTitle);
+    
+    // - grant access
     ss.addEditor(_ADMIN_MAIL)
     
     // - send email
     sendEmail(ss)
     
+    // - set to true
+    didCreate = true;
   }
   
   // - set the spreadsheet globally
@@ -95,6 +101,18 @@ function doGet(){
   Logger.log(_CURRENT_START_TIME)
   Logger.log(_LAST_START_TIME)
   Logger.log(_CURRENT_STATUS)
+  
+  // - if a new sheet was created
+  if (didCreate) {
+    Logger.log("DELETING DEFAULT SHEET")
+    // - get the sheets
+    var sheets = _SPREADSHEET.getSheets()
+    if (sheets[0] != "undefined") {
+      _SPREADSHEET.setActiveSheet(sheets[0])
+      _SPREADSHEET.deleteActiveSheet()
+    }
+    
+  }
   
   // - check time constraints
   if (
