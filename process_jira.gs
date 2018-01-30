@@ -60,12 +60,11 @@ function processJira(projectName, object, sheetObject){
       
       // - set environment variables
       // - get issue date
-      var issueDueDate = typeof currentIssueFields.resolutiondate == 'undefined' ? "" : currentIssueFields.resolutiondate;
-      issueDueDate = issueDueDate == "" ? "" : Moment.moment(issueDueDate).format("YYYY-MM-DD");
+      var issueDueDate = ""
       
       // - get issue resolution date
-      var issueResolutionDate = typeof currentIssueFields.resolutiondate == 'undefined' || currentIssueFields.resolutiondate == null ? "" : currentIssueFields.resolutiondate;
-      issueResolutionDate = issueResolutionDate == "" ? "" : Moment.moment(currentIssueFields.resolutiondate).format("YYYY-MM-DD");
+      var issueResolutionDate = typeof currentIssueFields.resolutiondate == 'undefined' || currentIssueFields.resolutiondate == null ? "-" : currentIssueFields.resolutiondate;
+      issueResolutionDate = issueResolutionDate == "-" ? "" : Moment.moment(currentIssueFields.resolutiondate).format("YYYY-MM-DD");
       
       // - set the issue status
       var issueStatus = issueResolutionDate != '' ? "完了" : "仕掛中"
