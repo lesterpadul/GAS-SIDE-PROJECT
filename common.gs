@@ -290,3 +290,9 @@ function findItemInObject(array, needle, column){
   // - return whatever result
   return exists;
 }
+
+//MARK: - check if passed execution time
+function isPassExecutionTime(){
+  var currentTime = Moment.moment().unix()
+  return (currentTime - _PROCESS_START_TIME) > 240
+}

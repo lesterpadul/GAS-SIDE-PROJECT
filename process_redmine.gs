@@ -45,11 +45,12 @@ function processRedMine(projectName, object, sheetObject){
       issueDueDate = issueDueDate == null ? null : Moment.moment(issueDueDate).format("YYYY-MM-DD");
       var issueStatus = typeof currentIssue.closed_on != 'undefined' ? "完了" : "仕掛中"
       var issueEstHours = typeof currentIssue.estimated_hours != 'undefined' ? currentIssue.estimated_hours : 0
-      var issueTrackerName = typeof currentIssue.tracker != "undefined" ? typeof currentIssue.tracker.name != 'undefined' ? currentIssue.tracker.name : "-" : "-"
-      var issueAccountItem = "-"
-      var issueAssignee = typeof currentAssignee.name == 'undefined' ? "-" : currentAssignee.name;
-      var issueCustomName = typeof currentIssue.custom_fields != 'undefined' ? currentIssue.custom_fields[0].name : "-"
-      var issueCustomValue = typeof currentIssue.custom_fields != 'undefined' ? currentIssue.custom_fields[0].value : "-"
+      var issueTrackerName = typeof currentIssue.tracker != "undefined" ? typeof currentIssue.tracker.name != 'undefined' ? currentIssue.tracker.name : "" : ""
+      var issueAccountItem = ""
+      var issueAssignee = typeof currentAssignee.name == 'undefined' ? "" : currentAssignee.name;
+      var issueTeam = issueAssignee.substring(0,2) == "KB" ? "カラビナ" : "東京"
+      var issueCustomName = typeof currentIssue.custom_fields != 'undefined' ? currentIssue.custom_fields[0].name : ""
+      var issueCustomValue = typeof currentIssue.custom_fields != 'undefined' ? currentIssue.custom_fields[0].value : ""
       var brandInformation = findItemInObject(structBrand, issueCustomValue, "identifier");
       
       // - set account item
@@ -86,13 +87,13 @@ function processRedMine(projectName, object, sheetObject){
           continue;
         }
       } else {
-        issueDueDate = "-"
+        issueDueDate = ""
       }
       
       // - set the client and brand name
-      var clientName = typeof brandInformation.client_name == "undefined" ? "-" : brandInformation.client_name
-      var brandName = typeof brandInformation.brand_name == "undefined" ? "-" : brandInformation.brand_name
-      var mallName = typeof brandInformation.mall_name == "undefined" ? "-" : brandInformation.mall_name
+      var clientName = typeof brandInformation.client_name == "undefined" ? "" : brandInformation.client_name
+      var brandName = typeof brandInformation.brand_name == "undefined" ? "" : brandInformation.brand_name
+      var mallName = typeof brandInformation.mall_name == "undefined" ? "" : brandInformation.mall_name
       
       // - get time summary
       var issueTimeSummary = processRedmineIssueSummaryTime(currentIssue.id, apiKey);
@@ -137,22 +138,22 @@ function processRedMine(projectName, object, sheetObject){
       bodyArray.push(issueTimeSummary.totalHours)
       
       // - issue estimated cost, TBD - 請求金額
-      bodyArray.push("-")
+      bodyArray.push("")
       
       // - issue account item, NEED TO ASK - 勘定科目
       bodyArray.push(issueAccountItem)
       
       // - scheduled release month, EMPTY
-      bodyArray.push("-")
+      bodyArray.push("")
       
       // - team name - チーム名, TBD
-      bodyArray.push("-")
+      bodyArray.push(issueTeam)
       
       // - contact name - 担当者名, TBD
       bodyArray.push(issueAssignee)
       
       // - remarks - 備考, TBD
-      bodyArray.push("-")
+      bodyArray.push("")
       
       // - append body content
       sheetObject.appendRow(bodyArray);
@@ -197,6 +198,12 @@ function processRedMine(projectName, object, sheetObject){
     
     // - update sheet settings
     updateSheetSettings()
+    
+    // - check if pass the allowed execution time
+    if (isPassExecutionTime()) {
+      hasNext = false;
+      break;
+    }
   }
 }
 
@@ -215,8 +222,8 @@ function processRedmineIssueSummaryTime(issueID, apiKey){
   var timeEntries = typeof response["issue"] == 'undefined' ? {} : response["issue"];
   
   // - get the total hours
-  totalHoursParent = typeof timeEntries.total_estimated_hours == "undefined" ? "-" : timeEntries.total_estimated_hours;
-  totalHours = typeof timeEntries.total_spent_hours == "undefined" ? "-" : timeEntries.total_spent_hours;
+  totalHoursParent = typeof timeEntries.total_estimated_hours == "undefined" ? "" : timeEntries.total_estimated_hours;
+  totalHours = typeof timeEntries.total_spent_hours == "undefined" ? "" : timeEntries.total_spent_hours;
   
   // - return total hours
   return {totalHours: totalHours, totalHoursParent: totalHoursParent};

@@ -46,6 +46,8 @@ var _CURRENT_STATUS = "DONE"
 // - access mail
 var _ADMIN_MAIL = "killkue@gmail.com"
 
+var _PROCESS_START_TIME = Moment.moment().unix();
+
 // - doGet function
 function doGet(){
   // - get current dates
@@ -122,14 +124,14 @@ function doGet(){
     _LAST_START_TIME.length == 0 ||
     _CURRENT_START_TIME.length == 0) ||
     
-    // - if status is still ongoing, run after 7 minutes
+    // - if status is still ongoing, run after 5 minutes
     (
       _LAST_START_TIME.length != 0 &&
       _CURRENT_START_TIME.length != 0 &&
       _LAST_START_TIME != null &&
       _CURRENT_START_TIME != null &&
       _CURRENT_START_TIME.getTime() > _LAST_START_TIME.getTime() &&
-      ((_CURRENT_START_TIME.getTime() - _LAST_START_TIME.getTime())/1000) >= 420 &&
+      ((_CURRENT_START_TIME.getTime() - _LAST_START_TIME.getTime())/1000) >= 360 &&
       _CURRENT_STATUS == "ONGOING"
     ) ||
     
@@ -305,8 +307,7 @@ function generateSpreadsheets() {
     _DID_GENERATE_NEW = false;
     
     // - if has no sheet
-    if (sheetObject == null) {
-      // - insert new sheet
+    if (sheetObject == null) { 
       sheetObject = _SPREADSHEET.insertSheet(project.project_title);
       
       // - set flag for generating new sheet
@@ -353,6 +354,10 @@ function generateSpreadsheets() {
       // - after each loop, clean the settings
       resetSheetSettings();
       
+      // - check if pass the allowed execution time
+      if (isPassExecutionTime()) {
+        break;
+      }
     }
     
     // - clear all the sheeet settings so far
@@ -362,6 +367,15 @@ function generateSpreadsheets() {
       hideLogger();
     }
     
+    // - check if pass the allowed execution time
+    if (isPassExecutionTime()) {
+      break;
+    }
+  }
+  
+  // - check if pass the allowed execution time
+  if (isPassExecutionTime()) {
+    Logger.log("MAX EXECUTION TIME REACHED!")
   }
   
 }

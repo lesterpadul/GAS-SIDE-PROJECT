@@ -60,53 +60,52 @@ function processJira(projectName, object, sheetObject){
       
       // - set environment variables
       // - get issue date
-      var issueDueDate = typeof currentIssueFields.resolutiondate == 'undefined' ? "-" : currentIssueFields.resolutiondate;
-      issueDueDate = !issueDueDate ? "-" : issueDueDate;
-      issueDueDate = issueDueDate == "-" ? "-" : Moment.moment(issueDueDate).format("YYYY-MM-DD");
+      var issueDueDate = typeof currentIssueFields.resolutiondate == 'undefined' ? "" : currentIssueFields.resolutiondate;
+      issueDueDate = issueDueDate == "" ? "" : Moment.moment(issueDueDate).format("YYYY-MM-DD");
       
       // - get issue resolution date
-      var issueResolutionDate = typeof currentIssueFields.resolutiondate == 'undefined' || currentIssueFields.resolutiondate == null ? "-" : currentIssueFields.resolutiondate;
-      issueResolutionDate = issueResolutionDate == "-" ? "-" : Moment.moment(currentIssueFields.resolutiondate).format("YYYY-MM-DD");
+      var issueResolutionDate = typeof currentIssueFields.resolutiondate == 'undefined' || currentIssueFields.resolutiondate == null ? "" : currentIssueFields.resolutiondate;
+      issueResolutionDate = issueResolutionDate == "" ? "" : Moment.moment(currentIssueFields.resolutiondate).format("YYYY-MM-DD");
       
       // - set the issue status
-      var issueStatus = issueResolutionDate != '-' ? "完了" : "仕掛中"
+      var issueStatus = issueResolutionDate != '' ? "完了" : "仕掛中"
       
       // - get issue assignee
-      var issueAssignee = typeof currentIssueAssignee.name == 'undefined' ? "-" : currentIssueAssignee.name;
+      var issueAssignee = typeof currentIssueAssignee.name == 'undefined' ? "" : currentIssueAssignee.name;
       
       // - get issue key
-      var issueKey = typeof currentIssue.key == 'undefined' ? "-" : currentIssue.key;
+      var issueKey = typeof currentIssue.key == 'undefined' ? "" : currentIssue.key;
       
       // - set issue summary
-      var issueSummary = typeof currentIssueFields.summary == "undefined" ? "-" : currentIssueFields.summary;
+      var issueSummary = typeof currentIssueFields.summary == "undefined" ? "" : currentIssueFields.summary;
       
       // - set estimated hours
       var issueEstimatedHours = typeof currentIssueFields.aggregatetimeoriginalestimate == 'undefined' ? false : parseInt(currentIssueFields.aggregatetimeoriginalestimate);
-      issueEstimatedHours = isNaN(issueEstimatedHours) ? "-" : (issueEstimatedHours/60)/60;
+      issueEstimatedHours = isNaN(issueEstimatedHours) ? "" : (issueEstimatedHours/60)/60;
       
       // - set the actual hours spent per issue
       var issueActualHours = typeof currentIssueFields.aggregatetimespent == 'undefined' ? false : parseInt(currentIssueFields.aggregatetimespent);
-      issueActualHours = isNaN(issueActualHours) ? "-" : (issueActualHours/60)/60;
+      issueActualHours = isNaN(issueActualHours) ? "" : (issueActualHours/60)/60;
       
       // - set the issue tracker name
-      var issueTrackerName = typeof currentIssueFields.customfield_10007 == 'undefined' ? "-" : currentIssueFields.customfield_10007;
+      var issueTrackerName = typeof currentIssueFields.customfield_10007 == 'undefined' ? "" : currentIssueFields.customfield_10007;
       
       // - get issue dates
       var issueDates = {};
-      var issueGroupNames = "-";
+      var issueGroupNames = "";
       
       // - get the labels
       var issueLabels = typeof currentIssueFields.labels != "undefined" ? currentIssueFields.labels : [];
       var issueIdentifier = getJIRAIdentifierInfo(issueLabels)
       
       // - if has an issue key
-      if (issueKey != "-" && issueKey) {
+      if (issueKey != "" && issueKey) {
         issueDates = processJIRASummaryTime(issueKey);
         
       }
       
       // - if has issue assignee
-      if (issueAssignee != "-" && issueAssignee) {
+      if (issueAssignee != "" && issueAssignee) {
         // - check if the same key already exists in the temporary container
         var hasGroupValue = getValueFromArrayByKey(issueAssignee, JIRA_GROUP_NAME_CONTAINER);
         if (typeof hasGroupValue.value != "undefined") {
@@ -121,7 +120,7 @@ function processJira(projectName, object, sheetObject){
       }
       
       // - if has issue tracker name
-      if (issueTrackerName != "-" && issueTrackerName) {
+      if (issueTrackerName != "" && issueTrackerName) {
         // - check if the same key already exists in the temporary container
         var hasEpicValue = getValueFromArrayByKey(issueTrackerName, JIRA_EPIC_CONTAINER);
         if (typeof hasEpicValue.value != "undefined") {
@@ -136,10 +135,10 @@ function processJira(projectName, object, sheetObject){
       }
       
       // - get the issue start date
-      var issueStartDate = typeof issueDates.startDate != 'undefined' ? issueDates.startDate : "-"
+      var issueStartDate = typeof issueDates.startDate != 'undefined' ? issueDates.startDate : ""
       
       // - if issue start date is empty, don't continue
-      if (issueStartDate == "-") {
+      if (issueStartDate == "") {
         continue;
       }
       
@@ -148,13 +147,13 @@ function processJira(projectName, object, sheetObject){
       bodyArray.push(projectName);
       
       //MARK: - issue custom name, custom_files[0].name - クライアント名
-      bodyArray.push(typeof issueIdentifier["client_name"] == "undefined" ? "-" : issueIdentifier["client_name"]);
+      bodyArray.push(typeof issueIdentifier["client_name"] == "undefined" ? "" : issueIdentifier["client_name"]);
       
       //MARK: - issue custom value, custom_files[0].value - ブランド
-      bodyArray.push(typeof issueIdentifier["brand_name"] == "undefined" ? "-" : issueIdentifier["brand_name"]);
+      bodyArray.push(typeof issueIdentifier["brand_name"] == "undefined" ? "" : issueIdentifier["brand_name"]);
       
       //MARK: - issue empty value, mall information - モール
-      bodyArray.push(typeof issueIdentifier["mall_name"] == "undefined" ? "-" : issueIdentifier["mall_name"]);
+      bodyArray.push(typeof issueIdentifier["mall_name"] == "undefined" ? "" : issueIdentifier["mall_name"]);
       
       //MARK: - issue id - ID
       bodyArray.push(issueKey);
@@ -181,10 +180,10 @@ function processJira(projectName, object, sheetObject){
       bodyArray.push(issueActualHours);
       
       //MARK: - issue estimated cost, TBD - 請求金額
-      bodyArray.push("-");
+      bodyArray.push("");
       
       //MARK: - issue account item, NEED TO ASK - 勘定科目
-      bodyArray.push("-");
+      bodyArray.push("");
       
       //MARK: - scheduled release month, EMPTY
       bodyArray.push(issueDueDate);
@@ -196,7 +195,7 @@ function processJira(projectName, object, sheetObject){
       bodyArray.push(issueAssignee);
       
       //MARK: - remarks - 備考
-      bodyArray.push("-");
+      bodyArray.push("");
       
       //MARK: - append body content
       sheetObject.appendRow(bodyArray);
@@ -237,6 +236,12 @@ function processJira(projectName, object, sheetObject){
     
     // - update sheet settings
     updateSheetSettings()
+    
+    // - check if pass the allowed execution time
+    if (isPassExecutionTime()) {
+      hasNext = false;
+      break;
+    }
   }
   
 }
@@ -266,7 +271,7 @@ function processJIRASummaryTime(issueID){
   var apiKey = structSpreadsheet.sheet_api_key;
   
   // - set total hours
-  var objReturn = {startDate: "-", actualHours: "-"};
+  var objReturn = {startDate: "", actualHours: ""};
   var totalSeconds = 0;
   var oldestCreated = false;
   
@@ -282,7 +287,7 @@ function processJIRASummaryTime(issueID){
       var workLog = workLogs[i];
       
       // - get total seconds
-      var totalTimeSpent = typeof workLog.timeSpentSeconds == "undefined" ? "-" : parseInt(workLog.timeSpentSeconds);
+      var totalTimeSpent = typeof workLog.timeSpentSeconds == "undefined" ? "" : parseInt(workLog.timeSpentSeconds);
       totalTimeSpent = isNaN(totalTimeSpent) ? 0 : totalTimeSpent;
       
       // - increment the total seconds
@@ -326,8 +331,8 @@ function processJIRASummaryTime(issueID){
   }
   
   // - set the resolution date
-  oldestCreated = !oldestCreated ? "-" : oldestCreated;
-  oldestCreated = oldestCreated == "-" ? "-" : Moment.moment(oldestCreated).format("YYYY-MM-DD");
+  oldestCreated = !oldestCreated ? "" : oldestCreated;
+  oldestCreated = oldestCreated == "" ? "" : Moment.moment(oldestCreated).format("YYYY-MM-DD");
   
   // - convert seconds to hours
   objReturn.actualHours = (totalSeconds/60)/60;
@@ -352,7 +357,7 @@ function processJIRAGroupNames(designatedUser){
   
   // - if has no groups, return value
   if (groups.length == 0) {
-    return "-";
+    return "";
   }
   
   // - if has groups, try parsing the information
@@ -405,7 +410,7 @@ function processJIRAGroupNames(designatedUser){
   }
   
   // - return total hours
-  return objReturn.length == 0 ? "-" : objReturn;
+  return objReturn.length == 0 ? "" : objReturn;
 }
 
 /*
@@ -419,7 +424,7 @@ function processJIRAEpic(issueID){
   // - set response
   var response = postJIRARequest("https://diamondhead.atlassian.net/rest/api/2/issue/" + issueID);
   var responseIssues = typeof response["fields"] == "undefined" ? {} : response["fields"];
-  var objReturn = typeof responseIssues["customfield_10008"] == 'undefined' ? "-" : responseIssues["customfield_10008"];
+  var objReturn = typeof responseIssues["customfield_10008"] == 'undefined' ? "" : responseIssues["customfield_10008"];
   
   // - return total hours
   return objReturn;
@@ -431,7 +436,7 @@ getJIRAIdentifierInfo
 */
 function getJIRAIdentifierInfo(labels){
   // - object to return
-  var objReturn = {'client_name': "-", 'brand_name': "-", 'mall_name': "-"};
+  var objReturn = {'client_name': "", 'brand_name': "", 'mall_name': ""};
   
   // - if labels is empty return default
   if (labels.length == 0) {
@@ -446,9 +451,9 @@ function getJIRAIdentifierInfo(labels){
     // - if tmp object gets a hit, return immediately
     if (tmpObj != false) {
       // - set the returned values
-      objReturn.client_name = typeof tmpObj.client_name != "undefined" ? tmpObj.client_name : "-" 
-      objReturn.brand_name = typeof tmpObj.brand_name != "undefined" ? tmpObj.brand_name : "-"
-      objReturn.mall_name = typeof tmpObj.mall_name != "undefined" ? tmpObj.mall_name : "-"
+      objReturn.client_name = typeof tmpObj.client_name != "undefined" ? tmpObj.client_name : "" 
+      objReturn.brand_name = typeof tmpObj.brand_name != "undefined" ? tmpObj.brand_name : ""
+      objReturn.mall_name = typeof tmpObj.mall_name != "undefined" ? tmpObj.mall_name : ""
       return objReturn
     }
   }
