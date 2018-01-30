@@ -46,7 +46,11 @@ var _CURRENT_STATUS = "DONE"
 // - access mail
 var _ADMIN_MAIL = "killkue@gmail.com"
 
+// - set the process start time
 var _PROCESS_START_TIME = Moment.moment().unix();
+
+// - set the folder id
+var _FOLDERID = "1T7tFc_SqTtEoSoIemi0Wr7iB1qRPdIAA"
 
 // - doGet function
 function doGet(){
@@ -63,7 +67,8 @@ function doGet(){
   var sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(), "GMT+9", "yyyy-MM");
   
   // - get drive
-  var files = DriveApp.getFilesByName(sheetTitle);
+  var folder = DriveApp.getFolderById(_FOLDERID);
+  var files = folder.getFilesByName(sheetTitle);
   var ss = null;
   var didCreate = false;
   
@@ -79,6 +84,15 @@ function doGet(){
   } else {
     // - create new sheet
     ss = SpreadsheetApp.create(sheetTitle);
+    
+    // - get
+    var file = DriveApp.getFileById(ss.getId());
+    
+    // - add file to the folder
+    folder.addFile(file);
+    
+    // - remove file from the root folder
+    DriveApp.getRootFolder().removeFile(file);
     
     // - grant access
     ss.addEditor(_ADMIN_MAIL)
