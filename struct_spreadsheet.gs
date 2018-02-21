@@ -1,7 +1,17 @@
 //MARK: - get data structures
 var structSpreadsheet = {
   // - sheet api key
-  "sheet_api_key": "d35ce1f282760a437c0aa08f04218fba24c22cfc",
+  "sheet_api_key": "",
+  
+  // - jira credentials
+  "jira_login_id": "",
+  "jira_login_pw": "",
+  
+  // - folder id
+  "folder_id": "",
+  
+  // - set the shet content
+  "sheet_content": [],
   
   // - sheet headers
   "sheet_headers": [
@@ -76,117 +86,6 @@ var structSpreadsheet = {
     {
       "eng_name": "remarks",
       "jp_name": "備考"
-    }
-  ],
-  
-  // - spreadsheet sheets
-  "sheet_content": [
-    // - DS2 sheet
-    {
-      "project_title": "DS2.0",
-      "project_code": "ds_2",
-      "api_urls": [
-        {
-          "type": "redmine",
-          "project_id": 20
-        },
-        {
-          "type": "jira",
-          "project_id": "DS2"
-        }
-      ]
-    },
-    
-    // - DS3 sheet
-    {
-      "project_title": "DS3",
-      "project_code": "ds3",
-      "api_urls": [
-        {
-          "type": "jira",
-          "project_id": "DS3"
-        }
-      ]
-    },
-    
-    // - SCS sheet
-    {
-      "project_title": "SCS",
-      "project_code": "scs",
-      "api_urls": [
-        {
-          "type": "jira",
-          "project_id": "SCS"
-        }
-      ]
-    },
-    
-    // - OMS sheet
-    {
-      "project_title": "OMS",
-      "project_code": "oms",
-      "api_urls": [
-        {
-          "type": "jira",
-          "project_id": "ID"
-        },
-        {
-          "type": "jira",
-          "project_id": "KO"
-        }
-      ]
-    },
-        
-    // - LANIKAI sheet
-    {
-      "project_title": "LANIKAI",
-      "project_code": "lanikai",
-      "api_urls": [
-        {
-          "type": "jira",
-          "project_id": "LAN"
-        },
-        {
-          "type": "jira",
-          "project_id": "LANOPE"
-        }
-      ]
-    },
-    
-    // - PVS sheet
-    {
-      "project_title": "PVS",
-      "project_code": "pvs",
-      "api_urls": [
-        {
-          "type": "jira",
-          "project_id": "PVS"
-        }
-      ]
-    },
-
-    // - SNAPLINE sheet
-    {
-      "project_title": "SNAPLINE",
-      "project_code": "snapline",
-      "api_urls": [
-        {
-          "type": "jira",
-          "project_id": "SNAPLINE"
-        }
-      ]
-    },
-    
-    // - AICO sheet            
-    {            
-      "project_title": "AICO",            
-      "project_code": "aico",               
-      "api_urls": [            
-        {            
-          "type": "jira",            
-          "project_id": "AICO"            
-        }            
-      ]            
     }
   ]
 }

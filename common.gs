@@ -46,17 +46,12 @@ function postJIRARequest(url){
     'method' : 'get',
     'contentType': 'application/json',
     'headers' : {
-      "Authorization": "Basic " + Utilities.base64Encode("bci.ohbuchi@karabiner.tech:karabiner0826")
+      "Authorization": "Basic " + Utilities.base64Encode(structSpreadsheet.jira_login_id + ":" + structSpreadsheet.jira_login_pw)
     }
   };
   
-  Logger.log("POSTING")
-  Logger.log(url)
-  
   // - get response
   var response = UrlFetchApp.fetch(url, options);
-  
-  Logger.log(response)
   
   // - initialise the global variables
   var jsonResponse = {};
@@ -64,10 +59,7 @@ function postJIRARequest(url){
   // - try parsing the json information
   try {
     jsonResponse = JSON.parse(response);
-  } catch (ex) {
-    Logger.log(ex)
-    
-  }
+  } catch (ex) { Logger.log(ex) }
   
   // - return response
   return jsonResponse;
@@ -295,4 +287,155 @@ function findItemInObject(array, needle, column){
 function isPassExecutionTime(){
   var currentTime = Moment.moment().unix()
   return (currentTime - _PROCESS_START_TIME) > 240
+}
+
+//MARK: - configuration information
+function parseConfig(){
+  var sheetTitle = "BasicConf";
+  
+  // - try fetching the sheet by name
+  var sheetObject = _SPREADSHEET.getSheetByName(sheetTitle);
+  
+  // - sheet object has no content
+  if (sheetObject == null) {
+    return;
+  }
+  
+  // - total rows
+  var totalRows = sheetObject.getLastRow();
+  
+  // - if has no rows
+  if (totalRows == 0) {
+    return;
+    
+  }
+  
+  // - loop through the rows
+  for (var i = 0; i < totalRows; i++) {
+    var key = sheetObject.getRange(i+1, 2).getValue();
+    var value = sheetObject.getRange(i+1, 3).getValue();
+    
+    // - get the folder id
+    if (key == "FOLDERID") {
+      structSpreadsheet.folder_id = value
+    }
+    
+    // - get the redmine api key
+    if (key == "REDMINE_API_KEY") {
+      structSpreadsheet.sheet_api_key = value
+    }
+    
+    // - get the JIRA login ID
+    if (key == "JIRA_LOGIN_ID") {
+      structSpreadsheet.jira_login_id = value
+    }
+    
+    // - get the JIRA login PW
+    if (key == "JIRA_LOGIN_PW") {
+      structSpreadsheet.jira_login_pw = value
+    }
+  }
+}
+
+//MARK: - parse brand information
+function parseBrand(){
+  var sheetTitle = "BrandConf";
+  
+  // - try fetching the sheet by name
+  var sheetObject = _SPREADSHEET.getSheetByName(sheetTitle);
+  
+  // - sheet object has no content
+  if (sheetObject == null) {
+    return;
+  }
+  
+  // - total rows
+  var totalRows = sheetObject.getLastRow();
+  
+  // - if has no rows
+  if (totalRows == 0) {
+    return;
+    
+  }
+  
+  // - reset the struct brand array
+  structBrand = [];
+  
+  // - loop through the rows
+  for (var i = 2; i < totalRows; i++) {
+    var identifier = sheetObject.getRange(i+1, 2).getValue();
+    var brandName = sheetObject.getRange(i+1, 3).getValue();
+    var clientName = sheetObject.getRange(i+1, 4).getValue();
+    var mallName = sheetObject.getRange(i+1, 5).getValue();
+    
+    // - push to struct brand array
+    structBrand.push({
+      client_name : clientName,
+      brand_name : brandName,
+      mall_name : clientName,
+      identifier : identifier
+    });
+  }
+}
+
+//MARK: - parse sheet information
+function parseSheetContent(){
+  var sheetTitle = "ProjectConf";
+  
+  // - try fetching the sheet by name
+  var sheetObject = _SPREADSHEET.getSheetByName(sheetTitle);
+  
+  // - sheet object has no content
+  if (sheetObject == null) {
+    return;
+  }
+  
+  // - total rows
+  var totalRows = sheetObject.getLastRow();
+  
+  // - if has no rows
+  if (totalRows == 0) {
+    return;
+    
+  }
+  
+  // - reset the struct brand array
+  structSpreadsheet.sheet_content = [];
+  
+  // - loop through the rows
+  for (var i = 2; i < totalRows; i++) {
+    var projectCode = sheetObject.getRange(i+1, 2).getValue();
+    var projectTitle = sheetObject.getRange(i+1, 3).getValue();
+    var apiType = sheetObject.getRange(i+1, 4).getValue();
+    var apiID = sheetObject.getRange(i+1, 5).getValue();
+    
+    // - empty project code
+    if (projectCode == "") {
+      continue;
+    }
+    
+    // - check if exists
+    var checkIfExists = findItemInObject(structSpreadsheet.sheet_content, projectCode, "project_code")
+    
+    // - if the index does not exist, push new
+    if (checkIfExists == false) {
+      Logger.log("PROJECT CODE, PUSHING : " + projectCode)
+      
+      // - push to struct brand array
+      structSpreadsheet.sheet_content.push({
+        "project_title": projectTitle,
+        "project_code": projectCode,
+        "api_urls": []
+      })
+    }
+    
+    // - get the current index
+    var arrayIndex = structSpreadsheet.sheet_content.length <= 0 ? 0 : structSpreadsheet.sheet_content.length - 1
+    
+    // - push to API URLs
+    structSpreadsheet.sheet_content[arrayIndex].api_urls.push({
+      "type": apiType,
+      "project_id": apiID
+    })
+  }
 }

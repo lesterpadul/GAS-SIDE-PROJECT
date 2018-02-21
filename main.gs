@@ -50,7 +50,7 @@ var _ADMIN_MAIL = "killkue@gmail.com"
 var _PROCESS_START_TIME = Moment.moment().unix();
 
 // - set the folder id
-//var _FOLDERID = "0AOhoWnMwCfPTUk9PVA"
+var _FOLDERID = "0AOhoWnMwCfPTUk9PVA"
 var _FOLDERID = "1T7tFc_SqTtEoSoIemi0Wr7iB1qRPdIAA"
 
 // - doGet function
@@ -58,6 +58,8 @@ function doGet(){
   // - get current dates
   var newTime = new Date();
   var currentHour = newTime.getHours();
+  var ss = null;
+  var didCreate = false;
   
   // - if first day of the month, and between 12:00 AM and 3:00AM (allowance of 3 hours just in case!)
   if ((currentHour >= 5)) {
@@ -70,8 +72,6 @@ function doGet(){
   // - get drive
   var folder = DriveApp.getFolderById(_FOLDERID);
   var files = folder.getFilesByName(sheetTitle);
-  var ss = null;
-  var didCreate = false;
   
   // - create or reuse sheet
   // - if has file
@@ -107,6 +107,15 @@ function doGet(){
   
   // - set the spreadsheet globally
   _SPREADSHEET = ss;
+  
+  // - parse configuration
+  parseConfig()
+  
+  // - parse brand
+  parseBrand()
+  
+  // - parse sheet content
+  parseSheetContent()
   
   // - debug
   Logger.log("INITIALIZING doGet")
@@ -173,6 +182,7 @@ function doGet(){
     
     // - generate the sheet
     try {
+      Logger.log("GENERATING SPREADSHEET")
       generateSpreadsheets();
       
     } catch (e) {
@@ -180,8 +190,7 @@ function doGet(){
       
     }
     
-  // - else log for repudiation
-  } else {
+    // - else log for repudiation
     Logger.log("DOING NOTHING, THE CODE MAY STILL BE RUNNING")
     Logger.log("LAST EXECUTION TIME WAS " + _LAST_START_TIME)
     Logger.log("CURRENT EXECUTION TIME IS " + _CURRENT_START_TIME)
@@ -307,6 +316,8 @@ function generateSpreadsheets() {
   var sheetProjects = typeof sheetStructure.sheet_content != 'undefined' ? sheetStructure.sheet_content : [];
   var sheetHeaders = typeof sheetStructure.sheet_headers != 'undefined' ? sheetStructure.sheet_headers : [];
   var startIndex = _CURRENT_PROJECT_INDEX;
+  
+  Logger.log(sheetProjects)
   
   // - setup sheet content
   for (var i = startIndex; i < sheetProjects.length; i++) {
