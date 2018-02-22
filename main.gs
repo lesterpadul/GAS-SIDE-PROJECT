@@ -1,76 +1,30 @@
-// - global spreadsheet variable
-var _SPREADSHEET = null;
-
-// - denotes the current sheet
-var _CURRENT_SHEET = null;
-
-// - denotes the current sheet status
-var _CURRENT_SHEET_STATUS = null;
-
-// - determines if a new sheet was generated
-var _DID_GENERATE_NEW = false;
-
-// - the index of the current project
-var _CURRENT_PROJECT_INDEX = 0;
-
-// - the index of the current project's issue
-var _CURRENT_PROJECT_ISSUE_INDEX = 0;
-
-// - the current proejct
-var _CURRENT_PROJECT = {};
-
-// - the last row of the current sheet
-var _CURRENT_SHEET_LAST_ROW = 1;
-
-// - the last offset of the sheet
-var _CURRENT_SHEET_LAST_OFFSET = 0;
-
-// - the last page of the sheet
-var _CURRENT_SHEET_LAST_PAGE = 1;
-
-// - catch when the sheet was parsed
-var _DID_PARSE_SHEET = false
-
-// - get start time
-var _CURRENT_START_TIME = null;
-
-// - get the end time
-var _CURRENT_END_TIME = null;
-
-// - get the last start time
-var _LAST_START_TIME = null;
-
-// -set the current status
-var _CURRENT_STATUS = "DONE"
-
-// - access mail
-var _ADMIN_MAIL = "killkue@gmail.com"
-
-// - set the process start time
-var _PROCESS_START_TIME = Moment.moment().unix();
-
-// - set the folder id
-var _FOLDERID = "0AOhoWnMwCfPTUk9PVA"
-var _FOLDERID = "1T7tFc_SqTtEoSoIemi0Wr7iB1qRPdIAA"
-
 // - doGet function
 function doGet(){
+  // - parse configuration
+  parseConfig()
+  
+  // - parse brand
+  parseBrand()
+  
+  // - parse sheet content
+  parseSheetContent()
+  
   // - get current dates
   var newTime = new Date();
   var currentHour = newTime.getHours();
   var ss = null;
   var didCreate = false;
   
-  // - if first day of the month, and between 12:00 AM and 3:00AM (allowance of 3 hours just in case!)
+  // - if first day of the month, and between 12:00 AM and 5:00AM (allocate an allowance of 5 hours just in case!)
   if ((currentHour >= 5)) {
-     //return false;
+      return false;
   }
   
   // - get sheet title
   var sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(), "GMT+9", "yyyy-MM");
   
   // - get drive
-  var folder = DriveApp.getFolderById(_FOLDERID);
+  var folder = DriveApp.getFolderById(structSpreadsheet.folder_id);
   var files = folder.getFilesByName(sheetTitle);
   
   // - create or reuse sheet
@@ -108,25 +62,8 @@ function doGet(){
   // - set the spreadsheet globally
   _SPREADSHEET = ss;
   
-  // - parse configuration
-  parseConfig()
-  
-  // - parse brand
-  parseBrand()
-  
-  // - parse sheet content
-  parseSheetContent()
-  
-  // - debug
-  Logger.log("INITIALIZING doGet")
-  
   // - trigger the status
   checkSheetStatus();
-  
-  // - log the time constraints
-  Logger.log(_CURRENT_START_TIME)
-  Logger.log(_LAST_START_TIME)
-  Logger.log(_CURRENT_STATUS)
   
   // - if a new sheet was created
   if (didCreate) {
@@ -170,8 +107,6 @@ function doGet(){
       _CURRENT_STATUS == "DONE"
     )
   ) {
-    Logger.log("RUNNING CODE");
-    
     // - if the current status is 'done', move to 'ongoing'
     if (_CURRENT_STATUS == "DONE") {
       _CURRENT_STATUS = "ONGOING"
@@ -182,18 +117,12 @@ function doGet(){
     
     // - generate the sheet
     try {
-      Logger.log("GENERATING SPREADSHEET")
       generateSpreadsheets();
       
     } catch (e) {
       logger("CAUGHT ERROR " + e)
       
     }
-    
-    // - else log for repudiation
-    Logger.log("DOING NOTHING, THE CODE MAY STILL BE RUNNING")
-    Logger.log("LAST EXECUTION TIME WAS " + _LAST_START_TIME)
-    Logger.log("CURRENT EXECUTION TIME IS " + _CURRENT_START_TIME)
     
   }
 }
@@ -225,7 +154,6 @@ function checkSheetStatus(){
     // - insert new sheet
     sheetStatus = _SPREADSHEET.insertSheet("sheet_process_status");
     lastStatus = "ONGOING";
-    logger("NO SHEET STATUS DETECTED, SETTING TO NULL")
     
   } else {
     // - total rows
@@ -241,7 +169,6 @@ function checkSheetStatus(){
         // - parse the status
         if (key == "STATUS") {
           lastStatus = value
-          logger("PARSING SHEET STATUS")
           
         }
         
@@ -256,13 +183,11 @@ function checkSheetStatus(){
       // - if the last status is not ongoing or done, set to done
       if (lastStatus != "ONGOING" && lastStatus != "DONE") {
         lastStatus = "DONE";
-        logger("SETTING SHEET STATUS TO DONE")
         
       }
       
     } else {
       lastStatus = "ONGOING";
-      logger("SETTING SHEET STATUS TO ONGOING")
       
     }
     
@@ -316,8 +241,6 @@ function generateSpreadsheets() {
   var sheetProjects = typeof sheetStructure.sheet_content != 'undefined' ? sheetStructure.sheet_content : [];
   var sheetHeaders = typeof sheetStructure.sheet_headers != 'undefined' ? sheetStructure.sheet_headers : [];
   var startIndex = _CURRENT_PROJECT_INDEX;
-  
-  Logger.log(sheetProjects)
   
   // - setup sheet content
   for (var i = startIndex; i < sheetProjects.length; i++) {

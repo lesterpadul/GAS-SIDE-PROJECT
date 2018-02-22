@@ -1,4 +1,55 @@
-//MARK: - get data structures
+// - global spreadsheet variable
+var _SPREADSHEET = null;
+
+// - denotes the current sheet
+var _CURRENT_SHEET = null;
+
+// - denotes the current sheet status
+var _CURRENT_SHEET_STATUS = null;
+
+// - determines if a new sheet was generated
+var _DID_GENERATE_NEW = false;
+
+// - the index of the current project
+var _CURRENT_PROJECT_INDEX = 0;
+
+// - the index of the current project's issue
+var _CURRENT_PROJECT_ISSUE_INDEX = 0;
+
+// - the current proejct
+var _CURRENT_PROJECT = {};
+
+// - the last row of the current sheet
+var _CURRENT_SHEET_LAST_ROW = 1;
+
+// - the last offset of the sheet
+var _CURRENT_SHEET_LAST_OFFSET = 0;
+
+// - the last page of the sheet
+var _CURRENT_SHEET_LAST_PAGE = 1;
+
+// - catch when the sheet was parsed
+var _DID_PARSE_SHEET = false
+
+// - get start time
+var _CURRENT_START_TIME = null;
+
+// - get the end time
+var _CURRENT_END_TIME = null;
+
+// - get the last start time
+var _LAST_START_TIME = null;
+
+// -set the current status
+var _CURRENT_STATUS = "DONE"
+
+// - access mail
+var _ADMIN_MAIL = "killkue@gmail.com"
+
+// - set the process start time
+var _PROCESS_START_TIME = Moment.moment().unix();
+
+// - get data structures
 var structSpreadsheet = {
   // - sheet api key
   "sheet_api_key": "",
@@ -88,4 +139,14 @@ var structSpreadsheet = {
       "jp_name": "備考"
     }
   ]
-}
+};
+
+// - set brand structure
+var structBrand = [  
+   {  
+      client_name: "",
+      brand_name: "",
+      mall_name: "",
+      identifier: ""
+   }
+];

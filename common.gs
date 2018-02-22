@@ -294,7 +294,7 @@ function parseConfig(){
   var sheetTitle = "BasicConf";
   
   // - try fetching the sheet by name
-  var sheetObject = _SPREADSHEET.getSheetByName(sheetTitle);
+  var sheetObject = SpreadsheetApp.getActive().getSheetByName(sheetTitle);
   
   // - sheet object has no content
   if (sheetObject == null) {
@@ -342,7 +342,7 @@ function parseBrand(){
   var sheetTitle = "BrandConf";
   
   // - try fetching the sheet by name
-  var sheetObject = _SPREADSHEET.getSheetByName(sheetTitle);
+  var sheetObject = SpreadsheetApp.getActive().getSheetByName(sheetTitle);
   
   // - sheet object has no content
   if (sheetObject == null) {
@@ -368,6 +368,11 @@ function parseBrand(){
     var clientName = sheetObject.getRange(i+1, 4).getValue();
     var mallName = sheetObject.getRange(i+1, 5).getValue();
     
+    // - if identifier is empty, skip
+    if (identifier == "") {
+      continue;
+    }
+    
     // - push to struct brand array
     structBrand.push({
       client_name : clientName,
@@ -383,7 +388,7 @@ function parseSheetContent(){
   var sheetTitle = "ProjectConf";
   
   // - try fetching the sheet by name
-  var sheetObject = _SPREADSHEET.getSheetByName(sheetTitle);
+  var sheetObject = SpreadsheetApp.getActive().getSheetByName(sheetTitle);
   
   // - sheet object has no content
   if (sheetObject == null) {
@@ -419,8 +424,6 @@ function parseSheetContent(){
     
     // - if the index does not exist, push new
     if (checkIfExists == false) {
-      Logger.log("PROJECT CODE, PUSHING : " + projectCode)
-      
       // - push to struct brand array
       structSpreadsheet.sheet_content.push({
         "project_title": projectTitle,
