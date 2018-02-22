@@ -1,12 +1,12 @@
 // - doGet function
 function doGet(){
-  // - parse configuration
+  // - parse configuration from sheet
   parseConfig()
   
-  // - parse brand
+  // - parse brand from sheet
   parseBrand()
   
-  // - parse sheet content
+  // - parse sheet content from sheet
   parseSheetContent()
   
   // - get current dates
@@ -17,7 +17,7 @@ function doGet(){
   
   // - if first day of the month, and between 12:00 AM and 5:00AM (allocate an allowance of 5 hours just in case!)
   if ((currentHour >= 5)) {
-      return false;
+    return false;
   }
   
   // - get sheet title
@@ -67,7 +67,6 @@ function doGet(){
   
   // - if a new sheet was created
   if (didCreate) {
-    Logger.log("DELETING DEFAULT SHEET")
     // - get the sheets
     var sheets = _SPREADSHEET.getSheets()
     if (sheets[0] != "undefined") {
