@@ -337,6 +337,47 @@ function parseConfig(){
   }
 }
 
+//MARK: - parse mall information
+function parseMall(){
+  var sheetTitle = "MallConf";
+  
+  // - try fetching the sheet by name
+  var sheetObject = SpreadsheetApp.getActive().getSheetByName(sheetTitle);
+  
+  // - sheet object has no content
+  if (sheetObject == null) {
+    return;
+  }
+  
+  // - total rows
+  var totalRows = sheetObject.getLastRow();
+  
+  // - if has no rows
+  if (totalRows == 0) {
+    return;
+    
+  }
+  
+  // - reset the struct brand array
+  structBrand = [];
+  
+  // - loop through the rows
+  for (var i = 2; i < totalRows; i++) {
+    var identifier = sheetObject.getRange(i+1, 2).getValue();
+    var MallName = sheetObject.getRange(i+1, 3).getValue();
+    
+    // - if identifier is empty, skip
+    if (identifier == "") {
+      continue;
+    }
+    
+    // - push to struct brand array
+    structMall.push({
+      brand_name : MallName,
+      identifier : identifier
+    });
+  }
+}
 //MARK: - parse brand information
 function parseBrand(){
   var sheetTitle = "BrandConf";
@@ -366,7 +407,6 @@ function parseBrand(){
     var identifier = sheetObject.getRange(i+1, 2).getValue();
     var brandName = sheetObject.getRange(i+1, 3).getValue();
     var clientName = sheetObject.getRange(i+1, 4).getValue();
-    var mallName = sheetObject.getRange(i+1, 5).getValue();
     
     // - if identifier is empty, skip
     if (identifier == "") {
@@ -377,7 +417,6 @@ function parseBrand(){
     structBrand.push({
       client_name : clientName,
       brand_name : brandName,
-      mall_name : clientName,
       identifier : identifier
     });
   }

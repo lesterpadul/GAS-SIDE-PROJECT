@@ -1,14 +1,5 @@
 // - doGet function
 function doGet(){
-  // - parse configuration from sheet
-  parseConfig()
-  
-  // - parse brand from sheet
-  parseBrand()
-  
-  // - parse sheet content from sheet
-  parseSheetContent()
-  
   // - get current dates
   var newTime = new Date();
   var currentHour = newTime.getHours();
@@ -19,6 +10,15 @@ function doGet(){
   if ((currentHour >= 5)) {
     return false;
   }
+  
+  // - parse configuration from sheet
+  parseConfig()
+  
+  // - parse brand from sheet
+  parseBrand()
+  
+  // - parse sheet content from sheet
+  parseSheetContent()
   
   // - get sheet title
   var sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(), "GMT+9", "yyyy-MM");
