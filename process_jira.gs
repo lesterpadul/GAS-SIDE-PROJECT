@@ -34,10 +34,15 @@ function processJira(projectName, object, sheetObject){
     // - setup URL information
     var url = "https://diamondhead.atlassian.net/rest/api/2/search?jql=";
     
-    // - encode the JQL params
+    //yun 02/02 start
+    // - encode the JQL params 
     var urlParams = "(project=" + object.project_id + " AND issuetype in standardIssueTypes() AND "
     urlParams += "((statusCategory in ('In Progress', 'To Do')) OR "
-    urlParams += "(statusCategory in ('Done') AND resolutiondate >= startOfMonth(-1) AND resolutiondate <= endOfMonth(-1))))"
+    urlParams += "(statusCategory in ('Done') AND resolutiondate >= startOfMonth())))"
+    
+    //一か月前
+    //urlParams += "(statusCategory in ('Done') AND resolutiondate >= startOfMonth(-1) AND resolutiondate <= endOfMonth(-1))))"
+    //yun 02/02 end
     
     // - append the encoded uri
     url += encodeURIComponent(urlParams) + "&startAt=" + offset + "&maxResults=" + limit
@@ -64,7 +69,7 @@ function processJira(projectName, object, sheetObject){
       
       // - get issue resolution date
       var issueResolutionDate = typeof currentIssueFields.resolutiondate == 'undefined' || currentIssueFields.resolutiondate == null ? "-" : currentIssueFields.resolutiondate;
-      issueResolutionDate = issueResolutionDate == "-" ? "" : Moment.moment(currentIssueFields.resolutiondate).format("YYYY-MM-DD");
+      issueResolutionDate = issueResolutionDate == "-" ? "" : Moment.moment(currentIssueFields.resolutiondate).format("YYYY/MM/DD");
       
       // - set the issue status
       var issueStatus = issueResolutionDate != '' ? "完了" : "仕掛中"
@@ -92,6 +97,10 @@ function processJira(projectName, object, sheetObject){
       // - get issue dates
       var issueDates = {};
       var issueGroupNames = "";
+      
+      //yun 02/02 start
+      var issueAccountItem = ""
+      //yun 02/02 end
       
       // - get the labels
       var issueLabels = typeof currentIssueFields.labels != "undefined" ? currentIssueFields.labels : [];
@@ -132,6 +141,20 @@ function processJira(projectName, object, sheetObject){
         }
         
       }
+      
+      //yun 02/02 start
+      // - set account item
+      if (issueTrackerName == "機能開発" && issueStatus == "完了") {
+        issueAccountItem= "資産"
+        
+      } else if (issueTrackerName == "機能開発" && issueStatus == "仕掛中") {
+        issueAccountItem= "仮勘定"
+        
+      } else if (issueTrackerName == "保守" || issueTrackerName == "管理") {
+        issueAccountItem= "費用"
+        
+      } else {}
+      //yun 02/02 end
       
       // - get the issue start date
       var issueStartDate = typeof issueDates.startDate != 'undefined' ? issueDates.startDate : ""
@@ -182,7 +205,8 @@ function processJira(projectName, object, sheetObject){
       bodyArray.push("");
       
       //MARK: - issue account item, NEED TO ASK - 勘定科目
-      bodyArray.push("");
+      //yun 
+      bodyArray.push(issueAccountItem);
       
       //MARK: - scheduled release month, EMPTY
       bodyArray.push(issueDueDate);
@@ -245,6 +269,7 @@ function processJira(projectName, object, sheetObject){
   
 }
 
+//yun 02/02 start
 /*
 processJIRASummaryTime
 - param.object: contains a json object of the sheet's structure
@@ -293,14 +318,14 @@ function processJIRASummaryTime(issueID){
       totalSeconds += totalTimeSpent;
       
       // - if has no created
-      if (typeof workLog.created == 'undefined') {
+      if (typeof workLog.started == 'undefined') {
         continue;
         
       }
       
       // - if first time
       if (oldestCreated == false) {
-        oldestCreated = workLog.created;
+        oldestCreated = workLog.started;
         continue;
         
       }
@@ -311,7 +336,7 @@ function processJIRASummaryTime(issueID){
       
       // - if the new created is older than the previous date
       if (newCreated <= oldCreated) {
-        oldestCreated = workLog.created;
+        oldestCreated = workLog.started;
         
       }
       
@@ -331,7 +356,7 @@ function processJIRASummaryTime(issueID){
   
   // - set the resolution date
   oldestCreated = !oldestCreated ? "" : oldestCreated;
-  oldestCreated = oldestCreated == "" ? "" : Moment.moment(oldestCreated).format("YYYY-MM-DD");
+  oldestCreated = oldestCreated == "" ? "" : Moment.moment(oldestCreated).format("YYYY/MM/DD");
   
   // - convert seconds to hours
   objReturn.actualHours = (totalSeconds/60)/60;
@@ -340,6 +365,7 @@ function processJIRASummaryTime(issueID){
   // - return total hours
   return objReturn;
 }
+//yun 02/02 end
 
 /*
 processJIRAGroupNames

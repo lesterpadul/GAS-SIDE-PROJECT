@@ -40,9 +40,9 @@ function processRedMine(projectName, object, sheetObject){
       var currentAssignee = typeof currentIssue.assigned_to == 'undefined' ? {} : currentIssue.assigned_to;
       
       // - set environment variables
-      var issueStartDate = typeof currentIssue.start_date == 'undefined' ? null : currentIssue.start_date;
+      var issueStartDate = typeof currentIssue.start_date == 'undefined' ? null : Moment.moment(currentIssue.start_date).format("YYYY/MM/DD");
       var issueDueDate = typeof currentIssue.closed_on == 'undefined' ? null : currentIssue.closed_on;
-      issueDueDate = issueDueDate == null ? null : Moment.moment(issueDueDate).format("YYYY-MM-DD");
+      issueDueDate = issueDueDate == null ? null : Moment.moment(issueDueDate).format("YYYY/MM/DD");
       var issueStatus = typeof currentIssue.closed_on != 'undefined' ? "完了" : "仕掛中"
       var issueEstHours = typeof currentIssue.estimated_hours != 'undefined' ? currentIssue.estimated_hours : 0
       var issueTrackerName = typeof currentIssue.tracker != "undefined" ? typeof currentIssue.tracker.name != 'undefined' ? currentIssue.tracker.name : "" : ""
@@ -54,7 +54,8 @@ function processRedMine(projectName, object, sheetObject){
       var brandInformation = findItemInObject(structBrand, issueCustomValue, "identifier");
       
       // - set account item
-      if (issueTrackerName == "機能開発" && issueTrackerName == "ステータス=完了") {
+      //yun 02/01
+      if (issueTrackerName == "機能開発" && issueStatus == "完了") {
         issueAccountItem= "資産"
         
       } else if (issueTrackerName == "機能開発" && issueStatus == "仕掛中") {
@@ -69,11 +70,29 @@ function processRedMine(projectName, object, sheetObject){
       var isParent = typeof currentIssue.parent != 'undefined' ? false : true
       
       // - only include parent issues, and valid brands according ot the struct_brand.gs file
-      if (!isParent || brandInformation == false || issueStartDate == null) {
+      //yun 02/01
+      if (!isParent || issueStartDate == null) {
         continue;
       }
       
+      //yun 02/02 start
       // - translate to unix
+      if (issueDueDate != null) {
+        // - get the start of last month
+        var monthEstimatedStart = Moment.moment(new Date()).startOf('month').unix()
+        
+        // - issue due date
+        var currentIssueDueDate = Moment.moment(issueDueDate).unix()
+        
+        // - if less than start of this month
+        if (currentIssueDueDate < monthEstimatedStart ) {
+          continue;
+        }
+      } else {
+        issueDueDate = ""
+      }
+  
+      /* １ケ月前の分
       if (issueDueDate != null) {
         // - get the start of last month
         var lastMonthEstimatedStart = Moment.moment(new Date()).subtract(1, 'months').startOf('month').unix()
@@ -89,7 +108,9 @@ function processRedMine(projectName, object, sheetObject){
       } else {
         issueDueDate = ""
       }
-      
+      */
+      //yun 02/02 end
+    
       // - set the client and brand name
       var clientName = typeof brandInformation.client_name == "undefined" ? "" : brandInformation.client_name
       var brandName = typeof brandInformation.brand_name == "undefined" ? "" : brandInformation.brand_name
