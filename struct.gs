@@ -146,14 +146,6 @@ var structBrand = [
    {  
       client_name: "",
       brand_name: "",
-      identifier: ""
-   }
-];
-
-
-// - set brand structure
-var structMall = [  
-   {  
       mall_name: "",
       identifier: ""
    }
