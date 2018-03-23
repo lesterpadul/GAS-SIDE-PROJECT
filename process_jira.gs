@@ -40,16 +40,19 @@ function processJira(projectName, object, sheetObject){
     urlParams += "((statusCategory in ('In Progress', 'To Do')) OR "
     
     // - get the start of last month
-    var currentMonthStart = Moment.moment(new Date()).startOf('month').format('YYYY-MM-DD 00:00:00');
+    var currentMonthStart = Moment.moment(new Date()).startOf('month').format('YYYY-MM-DD');
     
     // - if within 1st and 6th day, start from the 7th day of last month
     if (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) {
-      currentMonthStart = Moment.moment(new Date()).subtract(1,'months').startOf('month').format('YYYY-MM-DD 00:00:00');
+      currentMonthStart = Moment.moment(new Date()).subtract(1,'months').startOf('month').format('YYYY-MM-DD');
+      var monthEstimatedEnd = Moment.moment(new Date()).subtract(1,'months').endOf('month').format('YYYY-MM-DD');
+      urlParams += "(statusCategory in ('Done') AND resolutiondate >= '" + currentMonthStart + "' AND resolutiondate <= '" + monthEstimatedEnd + "')))"
       
-    }
+    } else {
+      // - include data
+      urlParams += "(statusCategory in ('Done') AND resolutiondate >= '" + currentMonthStart + "')))"
     
-    // - include data
-    urlParams += "(statusCategory in ('Done') AND resolutiondate >= '" + currentMonthStart + "')))"
+    }
     
     // - append the encoded uri
     url += encodeURIComponent(urlParams) + "&startAt=" + offset + "&maxResults=" + limit
