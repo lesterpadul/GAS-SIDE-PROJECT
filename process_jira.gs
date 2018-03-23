@@ -31,7 +31,6 @@ function processJira(projectName, object, sheetObject){
   
   // - setup body content
   while (hasNext) {
-logger("FETCHING_JIRA_ISSUE: - processing issue name | " + projectName + " | " + offset)
     // - setup URL information
     var url = "https://diamondhead.atlassian.net/rest/api/2/search?jql=";
     
@@ -39,19 +38,25 @@ logger("FETCHING_JIRA_ISSUE: - processing issue name | " + projectName + " | " +
     // - encode the JQL params 
     var urlParams = "(project=" + object.project_id + " AND issuetype in standardIssueTypes() AND "
     urlParams += "((statusCategory in ('In Progress', 'To Do')) OR "
-    urlParams += "(statusCategory in ('Done') AND resolutiondate >= startOfMonth())))"
     
-    //一か月前
-    //urlParams += "(statusCategory in ('Done') AND resolutiondate >= startOfMonth(-1) AND resolutiondate <= endOfMonth(-1))))"
-    //yun 02/02 end
+    // - get the start of last month
+    var currentMonthStart = Moment.moment(new Date()).format('YYYY-MM-07 00:00:00');
+    
+    // - if within 1st and 6th day, start from the 7th day of last month
+    if (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) {
+      currentMonthStart = Moment.moment(new Date()).subtract(1,'months').format('YYYY-MM-07 00:00:00');
+      
+    }
+    
+    // - include data
+    urlParams += "(statusCategory in ('Done') AND resolutiondate >= '" + currentMonthStart + "')))"
     
     // - append the encoded uri
     url += encodeURIComponent(urlParams) + "&startAt=" + offset + "&maxResults=" + limit
     
     // - set the response
     var response = postJIRARequest(url);
-logger("FETCHING_JIRA_ISSUE: - processed issue name | " + projectName + " | " + offset)
-
+    
     // - if has no contents
     if (response["issues"].length == 0) {
       hasNext = false;

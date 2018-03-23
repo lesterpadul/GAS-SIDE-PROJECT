@@ -44,7 +44,9 @@ var _LAST_START_TIME = null;
 var _CURRENT_STATUS = "DONE"
 
 // - access mail
-var _ADMIN_MAIL = "killkue@gmail.com"
+var _ADMIN_MAIL = "padullester@gmail.com"
+
+var _CURRENT_DAY_CYCLE = 0
 
 // - set the process start time
 var _PROCESS_START_TIME = Moment.moment().unix();
