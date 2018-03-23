@@ -1,11 +1,11 @@
 // - doGet function
 function doGet(){
   // debug
-  var sampleDate = "March 1, 2018"
-
+  var currentDateTime = Moment.moment().format("YYYY-MM-DD")
+  var currentDateTime = "March 1, 2018"
+  
   //MARK: - set sheet primer information
-  var newTime = new Date();
-  var newTime = new Date(sampleDate)
+  var newTime = new Date(currentDateTime)
   var currentHour = newTime.getHours();
   var currentDay = newTime.getDate();
   var ss = null;
@@ -35,9 +35,9 @@ function doGet(){
   //MARK: - generate/reuse the sheet
   logger("MAIN_SHEET_INIT: - generating parent spreadsheet")
   // - get sheet title
-  var sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(sampleDate), "GMT+9", "yyyy-MM");
+  var sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(currentDateTime), "GMT+9", "yyyy-MM");
   if (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) {
-    sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(sampleDate), "GMT+9", "yyyy-MM-dd");
+    sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(currentDateTime), "GMT+9", "yyyy-MM-dd");
   }
   
   // - get drive
