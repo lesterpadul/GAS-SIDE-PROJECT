@@ -81,11 +81,11 @@ logger("FETCHING_REDMINE_ISSUE: - end of processing issue name | " + projectName
       // - translate to unix
       if (issueDueDate != null) {
         // - get the start of last month
-        var monthEstimatedStart = Moment.moment(new Date()).format('YYYY-MM-07 00:00:00');
+        var monthEstimatedStart = Moment.moment(Moment.moment(new Date()).format('YYYY-MM-07 00:00:00')).unix();
         
         // - if within 1st and 6th day
         if (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) {
-          monthEstimatedStart = Moment.moment(new Date()).subtract(1,'months').format('YYYY-MM-07 00:00:00');
+          monthEstimatedStart = Moment.moment(Moment.moment(new Date()).subtract(1,'months').format('YYYY-MM-07 00:00:00')).unix();
         }
         
         // - issue due date
