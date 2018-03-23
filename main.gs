@@ -2,7 +2,6 @@
 function doGet(){
   // debug
   var currentDateTime = Moment.moment().format("YYYY-MM-DD")
-  var currentDateTime = "March 1, 2018"
   
   //MARK: - set sheet primer information
   var newTime = new Date(currentDateTime)
@@ -16,7 +15,7 @@ function doGet(){
   
   //MARK: - if first day of the month, and between 12:00 AM and 5:00AM (allocate an allowance of 5 hours just in case!)
   if ((currentHour >= 5)) {
-    //return false;
+    return false;
   }
   
   //MARK: - start parsing the sheet configuration
