@@ -31,6 +31,7 @@ function processJira(projectName, object, sheetObject){
   
   // - setup body content
   while (hasNext) {
+logger("FETCHING_JIRA_ISSUE: - processing issue name | " + projectName + " | " + offset)
     // - setup URL information
     var url = "https://diamondhead.atlassian.net/rest/api/2/search?jql=";
     
@@ -49,7 +50,8 @@ function processJira(projectName, object, sheetObject){
     
     // - set the response
     var response = postJIRARequest(url);
-    
+logger("FETCHING_JIRA_ISSUE: - processed issue name | " + projectName + " | " + offset)
+
     // - if has no contents
     if (response["issues"].length == 0) {
       hasNext = false;
@@ -104,12 +106,16 @@ function processJira(projectName, object, sheetObject){
       
       // - get the labels
       var issueLabels = typeof currentIssueFields.labels != "undefined" ? currentIssueFields.labels : [];
+logger("FETCHING_JIRA_ISSUE_IDENTIFIER: - processing issue name | " + projectName + " | " + offset + " | issue id = " + issueKey)
       var issueIdentifier = getJIRAIdentifierInfo(issueLabels)
+logger("FETCHING_JIRA_ISSUE_IDENTIFIER: - processed issue name | " + projectName + " | " + offset + " | issue id = " + issueKey)
       
       // - if has an issue key
       if (issueKey != "" && issueKey) {
+logger("FETCHING_JIRA_SUMMARY_TIME: - processing summary time | " + projectName + " | " + offset + " | issue id = " + issueKey)
         issueDates = processJIRASummaryTime(issueKey);
-        
+logger("FETCHING_JIRA_SUMMARY_TIME: - processed summary time | " + projectName + " | " + offset + " | issue id = " + issueKey)
+
       }
       
       // - if has issue assignee
@@ -120,9 +126,11 @@ function processJira(projectName, object, sheetObject){
           issueGroupNames = hasGroupValue.value;
           
         } else {
+logger("FETCHING_JIRA_GROUP_NAMES: - processing summary time | " + projectName + " | " + offset + " | issue id = " + issueKey)
           issueGroupNames = processJIRAGroupNames(issueAssignee);
           JIRA_GROUP_NAME_CONTAINER.push({"key": issueAssignee, "value": issueGroupNames});
-          
+logger("FETCHING_JIRA_GROUP_NAMES: - processing summary time | " + projectName + " | " + offset + " | issue id = " + issueKey)
+
         }
         
       }
@@ -135,8 +143,10 @@ function processJira(projectName, object, sheetObject){
           issueTrackerName = hasEpicValue.value;
         
         } else {
+logger("FETCHING_JIRA_GROUP_NAMES: - processing summary time | " + projectName + " | " + offset + " | issue id = " + issueKey)
           issueTrackerName = processJIRAEpic(issueTrackerName);
           JIRA_EPIC_CONTAINER.push({"key": issueTrackerName, "value": issueTrackerName});
+logger("FETCHING_JIRA_GROUP_NAMES: - processing summary time | " + projectName + " | " + offset + " | issue id = " + issueKey)
           
         }
         
@@ -221,6 +231,7 @@ function processJira(projectName, object, sheetObject){
       bodyArray.push("");
       
       //MARK: - append body content
+logger("SETTING_JIRA_ROW_CONTENT: - processing issue row | " + projectName + " | " + offset + " | issue id = " + issueKey)
       sheetObject.appendRow(bodyArray);
       bodyArray = [""];
       
@@ -238,6 +249,7 @@ function processJira(projectName, object, sheetObject){
         var displayName = issueKey
         getKeyRange.setFormula("=hyperlink(\""+link+"\";\"" + displayName + "\")");
       }
+logger("SETTING_JIRA_ROW_CONTENT: - processed issue row | " + projectName + " | " + offset + " | issue id = " + issueKey)
     }
     
     // - get pagination information

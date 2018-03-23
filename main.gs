@@ -11,6 +11,7 @@ function doGet(){
     return false;
   }
   
+logger("CONFIG: - starting parse logic")
   // - parse configuration from sheet
   parseConfig()
   
@@ -19,7 +20,9 @@ function doGet(){
   
   // - parse sheet content from sheet
   parseSheetContent()
-  
+logger("CONFIG: - ending parse logic")
+
+logger("MAIN_SHEET_INIT: - finished generating parent spreadsheet")
   // - get sheet title
   var sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(), "GMT+9", "yyyy-MM");
   
@@ -58,13 +61,17 @@ function doGet(){
     // - set to true
     didCreate = true;
   }
-  
+logger("MAIN_SHEET_INIT: - got parent spreadsheet")
+
   // - set the spreadsheet globally
   _SPREADSHEET = ss;
   
+logger("STATUS_CHECK: - initializing status check")
   // - trigger the status
   checkSheetStatus();
+logger("STATUS_CHECK: - initialized status check")
   
+logger("DELETE_FIRST_SHEET: - deleting first sheet")
   // - if a new sheet was created
   if (didCreate) {
     // - get the sheets
@@ -75,6 +82,7 @@ function doGet(){
     }
     
   }
+logger("DELETE_FIRST_SHEET: - deleted first sheet")
   
   // - check time constraints
   if (
@@ -297,7 +305,10 @@ function generateSpreadsheets() {
     var startProjectIndex = _CURRENT_PROJECT_ISSUE_INDEX != 0 ? _CURRENT_PROJECT_ISSUE_INDEX : 0;
     for (var j = startProjectIndex; j < project["api_urls"].length; j++) {
       _CURRENT_PROJECT_ISSUE_INDEX = j;
+      
+logger("PROCESSING_ISSUE: - processing issue | " + project.project_title)
       processIssues(project.project_title, project["api_urls"][j], sheetObject);
+logger("PROCESSING_ISSUE: - end of processing issue | " + project.project_title)
       
       // - after each loop, clean the settings
       resetSheetSettings();
@@ -312,7 +323,6 @@ function generateSpreadsheets() {
     if (i == (sheetProjects.length - 1)) {
       clearSheetSettings();
       updateSheetStatus("DONE");
-      hideLogger();
     }
     
     // - check if pass the allowed execution time

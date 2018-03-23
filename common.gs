@@ -91,16 +91,15 @@ function updateSheetSettings(){
 //MARK: - update sheet settings
 function logger(log){
   // - try fetching the sheet by name
-  var sheetObject = _SPREADSHEET.getSheetByName("sheet_logs");
+  var sheetObject = SpreadsheetApp.getActive().getSheetByName("DebugLog");
   
   // - if has no sheet
   if (sheetObject == null) {
-    sheetObject = _SPREADSHEET.insertSheet("sheet_logs");
+    sheetObject = SpreadsheetApp.getActive().insertSheet("DebugLog");
     
   }
   
   // - append header row information
-  sheetObject.hideSheet();
   sheetObject.appendRow([new Date(), log]);
 }
 
