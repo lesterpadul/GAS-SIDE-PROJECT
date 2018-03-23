@@ -40,11 +40,11 @@ function processJira(projectName, object, sheetObject){
     urlParams += "((statusCategory in ('In Progress', 'To Do')) OR "
     
     // - get the start of last month
-    var currentMonthStart = Moment.moment(new Date()).format('YYYY-MM-07');
+    var currentMonthStart = Moment.moment(new Date()).startOf('month').format('YYYY-MM-DD 00:00:00');
     
     // - if within 1st and 6th day, start from the 7th day of last month
     if (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) {
-      currentMonthStart = Moment.moment(new Date()).subtract(1,'months').format('YYYY-MM-07');
+      currentMonthStart = Moment.moment(new Date()).subtract(1,'months').startOf('month').format('YYYY-MM-DD 00:00:00');
       
     }
     
