@@ -90,8 +90,6 @@ function updateSheetSettings(){
 
 //MARK: - update sheet settings
 function logger(log){
-  return;
-  
   // - try fetching the sheet by name
   var sheetObject = SpreadsheetApp.getActive().getSheetByName("DebugLog");
   

@@ -36,7 +36,7 @@ function processJira(projectName, object, sheetObject){
     
     //yun 02/02 start
     // - encode the JQL params 
-    var urlParams = "(project=" + object.project_id + " AND issuetype in standardIssueTypes() AND "
+    var urlParams = "(project='" + object.project_id + "' AND issuetype in standardIssueTypes() AND "
     urlParams += "((statusCategory in ('In Progress', 'To Do')) OR "
     
     // - get the start of last month
