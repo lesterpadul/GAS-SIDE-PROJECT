@@ -31,8 +31,10 @@ function processRedMine(projectName, object, sheetObject){
   // - setup body content
   while (hasNext) { 
     // - url
+logger("FETCHING_REDMINE_ISSUE: - processing issue name | " + projectName + " | " + offset)
     var url = "https://dh-redmine.diamondhead.jp/issues.json?key=" + apiKey + "&limit=" + limit + "&offset=" + offset + "&project_id=" + object.project_id + "&status_id=*";
     var response = fetchJSONData(url);
+logger("FETCHING_REDMINE_ISSUE: - end of processing issue name | " + projectName + " | " + offset)
     
     // - loop through the issues array
     for (var issuesIndex = 0; issuesIndex < response["issues"].length; issuesIndex++) {
@@ -79,10 +81,21 @@ function processRedMine(projectName, object, sheetObject){
       // - translate to unix
       if (issueDueDate != null) {
         // - get the start of last month
-        var monthEstimatedStart = Moment.moment(new Date()).startOf('month').unix()
+        var monthEstimatedStart = Moment.moment(Moment.moment(new Date()).startOf('month').format('YYYY-MM-DD')).unix();
         
         // - issue due date
         var currentIssueDueDate = Moment.moment(issueDueDate).unix()
+        
+        // - if within 1st and 6th day
+        if (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) {
+          monthEstimatedStart = Moment.moment(Moment.moment(new Date()).subtract(1,'months').startOf('month')).unix();
+          var monthEstimatedEnd = Moment.moment(Moment.moment(new Date()).subtract(1,'months').endOf('month')).unix();
+          
+          // - if less than start of this month
+          if (currentIssueDueDate < monthEstimatedStart || currentIssueDueDate > monthEstimatedEnd) {
+            continue;
+          } 
+        }
         
         // - if less than start of this month
         if (currentIssueDueDate < monthEstimatedStart ) {
@@ -91,33 +104,16 @@ function processRedMine(projectName, object, sheetObject){
       } else {
         issueDueDate = ""
       }
-  
-      /* １ケ月前の分
-      if (issueDueDate != null) {
-        // - get the start of last month
-        var lastMonthEstimatedStart = Moment.moment(new Date()).subtract(1, 'months').startOf('month').unix()
-        var lastMonthEstimatedEnd = Moment.moment(new Date()).subtract(1, 'months').endOf('month').unix()
-        
-        // - issue due date
-        var currentIssueDueDate = Moment.moment(issueDueDate).unix()
-        
-        // - if less than last month
-        if (currentIssueDueDate < lastMonthEstimatedStart || currentIssueDueDate > lastMonthEstimatedEnd) {
-          continue;
-        }
-      } else {
-        issueDueDate = ""
-      }
-      */
-      //yun 02/02 end
-    
+      
       // - set the client and brand name
       var clientName = typeof brandInformation.client_name == "undefined" ? "" : brandInformation.client_name
       var brandName = typeof brandInformation.brand_name == "undefined" ? "" : brandInformation.brand_name
       var mallName = typeof brandInformation.mall_name == "undefined" ? "" : brandInformation.mall_name
       
       // - get time summary
+logger("FETCHING_REDMINE_ISSUE_SUMMARY_TIME: - processing issue name | " + projectName + " | " + offset)
       var issueTimeSummary = processRedmineIssueSummaryTime(currentIssue.id, apiKey);
+logger("FETCHING_REDMINE_ISSUE_SUMMARY_TIME: - processing issue name | " + projectName + " | " + offset)
       
       // - push elements
       // - project name - プロジェクト
@@ -176,6 +172,7 @@ function processRedMine(projectName, object, sheetObject){
       // - remarks - 備考, TBD
       bodyArray.push("")
       
+logger("SETTING_REDMINE_ROW_CONTENT: - processing issue row | " + projectName + " | " + offset + " | issue = " + currentIssue.id)
       // - append body content
       sheetObject.appendRow(bodyArray);
       bodyArray = [""];
@@ -192,6 +189,7 @@ function processRedMine(projectName, object, sheetObject){
       var link = "https://dh-redmine.diamondhead.jp/issues/" + currentIssue.id
       var displayName = currentIssue.id
       getKeyRange.setFormula("=hyperlink(\""+link+"\";\"" + displayName + "\")");
+logger("SETTING_REDMINE_ROW_CONTENT: - processed issue row | " + projectName + " | " + offset + " | issue = " + currentIssue.id)
     }
     
     // - get pagination information

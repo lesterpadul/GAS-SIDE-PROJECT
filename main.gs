@@ -1,16 +1,26 @@
 // - doGet function
 function doGet(){
-  // - get current dates
-  var newTime = new Date();
+  // debug
+  var currentDateTime = Moment.moment().format("YYYY-MM-DD")
+  
+  //MARK: - set sheet primer information
+  var newTime = new Date(currentDateTime)
   var currentHour = newTime.getHours();
+  var currentDay = newTime.getDate();
   var ss = null;
   var didCreate = false;
   
-  // - if first day of the month, and between 12:00 AM and 5:00AM (allocate an allowance of 5 hours just in case!)
+  //MARK: - set current day cycle (NEW!)
+  _CURRENT_DAY_CYCLE = currentDay
+  
+  //MARK: - if first day of the month, and between 12:00 AM and 5:00AM (allocate an allowance of 5 hours just in case!)
   if ((currentHour >= 5)) {
     return false;
   }
   
+  //MARK: - start parsing the sheet configuration
+  // - parse sheet information
+  logger("CONFIG: - starting parse logic")
   // - parse configuration from sheet
   parseConfig()
   
@@ -19,9 +29,15 @@ function doGet(){
   
   // - parse sheet content from sheet
   parseSheetContent()
+  logger("CONFIG: - ending parse logic")
   
+  //MARK: - generate/reuse the sheet
+  logger("MAIN_SHEET_INIT: - generating parent spreadsheet")
   // - get sheet title
-  var sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(), "GMT+9", "yyyy-MM");
+  var sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(currentDateTime), "GMT+9", "yyyy-MM");
+  if (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) {
+    sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(currentDateTime), "GMT+9", "yyyy-MM-dd");
+  }
   
   // - get drive
   var folder = DriveApp.getFolderById(structSpreadsheet.folder_id);
@@ -58,13 +74,18 @@ function doGet(){
     // - set to true
     didCreate = true;
   }
+  logger("MAIN_SHEET_INIT: - got parent spreadsheet")
   
-  // - set the spreadsheet globally
+  //MARK: - set the spreadsheet globally
   _SPREADSHEET = ss;
   
-  // - trigger the status
+  //MARK: - check sheet status
+  logger("STATUS_CHECK: - initializing status check")
   checkSheetStatus();
+  logger("STATUS_CHECK: - initialized status check")
   
+  //MARK: - delete first sheet if newly generated
+  logger("DELETE_FIRST_SHEET: - deleting first sheet")
   // - if a new sheet was created
   if (didCreate) {
     // - get the sheets
@@ -75,8 +96,9 @@ function doGet(){
     }
     
   }
+  logger("DELETE_FIRST_SHEET: - deleted first sheet")
   
-  // - check time constraints
+  //MARK: - check time constraints
   if (
     // - if sheet settings is not present
     (_LAST_START_TIME == null ||
@@ -297,7 +319,10 @@ function generateSpreadsheets() {
     var startProjectIndex = _CURRENT_PROJECT_ISSUE_INDEX != 0 ? _CURRENT_PROJECT_ISSUE_INDEX : 0;
     for (var j = startProjectIndex; j < project["api_urls"].length; j++) {
       _CURRENT_PROJECT_ISSUE_INDEX = j;
+      
+logger("PROCESSING_ISSUE: - processing issue | " + project.project_title)
       processIssues(project.project_title, project["api_urls"][j], sheetObject);
+logger("PROCESSING_ISSUE: - end of processing issue | " + project.project_title)
       
       // - after each loop, clean the settings
       resetSheetSettings();
@@ -312,7 +337,6 @@ function generateSpreadsheets() {
     if (i == (sheetProjects.length - 1)) {
       clearSheetSettings();
       updateSheetStatus("DONE");
-      hideLogger();
     }
     
     // - check if pass the allowed execution time

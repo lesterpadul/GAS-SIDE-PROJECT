@@ -36,13 +36,23 @@ function processJira(projectName, object, sheetObject){
     
     //yun 02/02 start
     // - encode the JQL params 
-    var urlParams = "(project=" + object.project_id + " AND issuetype in standardIssueTypes() AND "
+    var urlParams = "(project='" + object.project_id + "' AND issuetype in standardIssueTypes() AND "
     urlParams += "((statusCategory in ('In Progress', 'To Do')) OR "
-    urlParams += "(statusCategory in ('Done') AND resolutiondate >= startOfMonth())))"
     
-    //一か月前
-    //urlParams += "(statusCategory in ('Done') AND resolutiondate >= startOfMonth(-1) AND resolutiondate <= endOfMonth(-1))))"
-    //yun 02/02 end
+    // - get the start of last month
+    var currentMonthStart = Moment.moment(new Date()).startOf('month').format('YYYY-MM-DD');
+    
+    // - if within 1st and 6th day, start from the 7th day of last month
+    if (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) {
+      currentMonthStart = Moment.moment(new Date()).subtract(1,'months').startOf('month').format('YYYY-MM-DD');
+      var monthEstimatedEnd = Moment.moment(new Date()).subtract(1,'months').endOf('month').format('YYYY-MM-DD');
+      urlParams += "(statusCategory in ('Done') AND resolutiondate >= '" + currentMonthStart + "' AND resolutiondate <= '" + monthEstimatedEnd + "')))"
+      
+    } else {
+      // - include data
+      urlParams += "(statusCategory in ('Done') AND resolutiondate >= '" + currentMonthStart + "')))"
+    
+    }
     
     // - append the encoded uri
     url += encodeURIComponent(urlParams) + "&startAt=" + offset + "&maxResults=" + limit
@@ -104,12 +114,16 @@ function processJira(projectName, object, sheetObject){
       
       // - get the labels
       var issueLabels = typeof currentIssueFields.labels != "undefined" ? currentIssueFields.labels : [];
+logger("FETCHING_JIRA_ISSUE_IDENTIFIER: - processing issue name | " + projectName + " | " + offset + " | issue id = " + issueKey)
       var issueIdentifier = getJIRAIdentifierInfo(issueLabels)
+logger("FETCHING_JIRA_ISSUE_IDENTIFIER: - processed issue name | " + projectName + " | " + offset + " | issue id = " + issueKey)
       
       // - if has an issue key
       if (issueKey != "" && issueKey) {
+logger("FETCHING_JIRA_SUMMARY_TIME: - processing summary time | " + projectName + " | " + offset + " | issue id = " + issueKey)
         issueDates = processJIRASummaryTime(issueKey);
-        
+logger("FETCHING_JIRA_SUMMARY_TIME: - processed summary time | " + projectName + " | " + offset + " | issue id = " + issueKey)
+
       }
       
       // - if has issue assignee
@@ -120,9 +134,11 @@ function processJira(projectName, object, sheetObject){
           issueGroupNames = hasGroupValue.value;
           
         } else {
+logger("FETCHING_JIRA_GROUP_NAMES: - processing summary time | " + projectName + " | " + offset + " | issue id = " + issueKey)
           issueGroupNames = processJIRAGroupNames(issueAssignee);
           JIRA_GROUP_NAME_CONTAINER.push({"key": issueAssignee, "value": issueGroupNames});
-          
+logger("FETCHING_JIRA_GROUP_NAMES: - processing summary time | " + projectName + " | " + offset + " | issue id = " + issueKey)
+
         }
         
       }
@@ -135,8 +151,10 @@ function processJira(projectName, object, sheetObject){
           issueTrackerName = hasEpicValue.value;
         
         } else {
+logger("FETCHING_JIRA_GROUP_NAMES: - processing summary time | " + projectName + " | " + offset + " | issue id = " + issueKey)
           issueTrackerName = processJIRAEpic(issueTrackerName);
           JIRA_EPIC_CONTAINER.push({"key": issueTrackerName, "value": issueTrackerName});
+logger("FETCHING_JIRA_GROUP_NAMES: - processing summary time | " + projectName + " | " + offset + " | issue id = " + issueKey)
           
         }
         
@@ -221,6 +239,7 @@ function processJira(projectName, object, sheetObject){
       bodyArray.push("");
       
       //MARK: - append body content
+logger("SETTING_JIRA_ROW_CONTENT: - processing issue row | " + projectName + " | " + offset + " | issue id = " + issueKey)
       sheetObject.appendRow(bodyArray);
       bodyArray = [""];
       
@@ -238,6 +257,7 @@ function processJira(projectName, object, sheetObject){
         var displayName = issueKey
         getKeyRange.setFormula("=hyperlink(\""+link+"\";\"" + displayName + "\")");
       }
+logger("SETTING_JIRA_ROW_CONTENT: - processed issue row | " + projectName + " | " + offset + " | issue id = " + issueKey)
     }
     
     // - get pagination information
