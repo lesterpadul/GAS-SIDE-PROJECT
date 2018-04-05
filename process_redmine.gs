@@ -86,6 +86,7 @@ logger("FETCHING_REDMINE_ISSUE: - end of processing issue name | " + projectName
         // - check if start date is within the 1st and 6th day of the month
         (
            issueStartDate != null &&
+           Moment.moment(issueStartDate).isValid() &&
            (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) &&
            unixIssueStartDate > monthEstimatedEnd
         )
