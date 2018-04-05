@@ -41,11 +41,11 @@ function processJira(projectName, object, sheetObject){
     
     // - get the start of last month
     var currentMonthStart = Moment.moment(new Date()).startOf('month').format('YYYY-MM-DD');
+    var monthEstimatedEnd = Moment.moment(new Date()).subtract(1,'months').endOf('month').format('YYYY-MM-DD');
     
     // - if within 1st and 6th day, start from the 7th day of last month
     if (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) {
       currentMonthStart = Moment.moment(new Date()).subtract(1,'months').startOf('month').format('YYYY-MM-DD');
-      var monthEstimatedEnd = Moment.moment(new Date()).subtract(1,'months').endOf('month').format('YYYY-MM-DD');
       urlParams += "(statusCategory in ('Done') AND resolutiondate >= '" + currentMonthStart + "' AND resolutiondate <= '" + monthEstimatedEnd + "')))"
       
     } else {
@@ -177,8 +177,21 @@ logger("FETCHING_JIRA_GROUP_NAMES: - processing summary time | " + projectName +
       // - get the issue start date
       var issueStartDate = typeof issueDates.startDate != 'undefined' ? issueDates.startDate : ""
       
+      // - unix issue start date
+      var unixIssueStartDate = Moment.moment(issueStartDate).unix();
+      var unixIssueMonthEstimatedEnd = Moment.moment(monthEstimatedEnd).unix();
+
       // - if issue start date is empty, don't continue
-      if (issueStartDate == "") {
+      if (
+        // - check if start date is empty
+        issueStartDate == "" ||
+        
+        // - check if start date is within the 1st and 6th day of the month
+        (
+           (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) &&
+           unixIssueStartDate > unixIssueMonthEstimatedEnd
+        )
+      ) {
         continue;
       }
       
