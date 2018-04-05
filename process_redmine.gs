@@ -74,7 +74,7 @@ logger("FETCHING_REDMINE_ISSUE: - end of processing issue name | " + projectName
       
       // - if has parent issue
       var isParent = typeof currentIssue.parent != 'undefined' ? false : true
-      var unixIssueStartDate = Moment.moent(issueStartDate).unix();
+      var unixIssueStartDate = Moment.moment(issueStartDate).unix();
 
       // - only include parent issues, and valid brands according ot the struct_brand.gs file
       //yun 02/01
@@ -85,6 +85,7 @@ logger("FETCHING_REDMINE_ISSUE: - end of processing issue name | " + projectName
 
         // - check if start date is within the 1st and 6th day of the month
         (
+           issueStartDate != null &&
            (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) &&
            unixIssueStartDate > monthEstimatedEnd
         )
