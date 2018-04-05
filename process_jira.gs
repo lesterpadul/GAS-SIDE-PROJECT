@@ -178,8 +178,9 @@ logger("FETCHING_JIRA_GROUP_NAMES: - processing summary time | " + projectName +
       var issueStartDate = typeof issueDates.startDate != 'undefined' ? issueDates.startDate : ""
       
       // - unix issue start date
-      var unixIssueStartDate = Moment.moment(issueStartDate);
-
+      var unixIssueStartDate = Moment.moment(issueStartDate).unix();
+      var unixMonthEstimatedEnd = Moment.moment(monthEstimatedEnd).unix();
+      
       // - if issue start date is empty, don't continue
       if (
         // - check if start date is empty
@@ -189,7 +190,7 @@ logger("FETCHING_JIRA_GROUP_NAMES: - processing summary time | " + projectName +
         (
            issueStartDate != "" &&
            (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) &&
-           unixIssueStartDate > monthEstimatedEnd
+           unixIssueStartDate > unixMonthEstimatedEnd
         )
       ) {
         continue;
