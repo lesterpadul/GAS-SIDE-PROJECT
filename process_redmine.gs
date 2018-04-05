@@ -94,12 +94,7 @@ logger("FETCHING_REDMINE_ISSUE: - end of processing issue name | " + projectName
           // - if less than start of this month
           if (currentIssueDueDate < monthEstimatedStart || currentIssueDueDate > monthEstimatedEnd) {
             continue;
-          } 
-        }
-        
-        // - if less than start of this month
-        if (currentIssueDueDate < monthEstimatedStart ) {
-          continue;
+          }
         }
       } else {
         issueDueDate = ""
