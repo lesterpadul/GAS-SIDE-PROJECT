@@ -4,7 +4,7 @@ function doGet(){
   var currentDateTime = Moment.moment().format("YYYY-MM-DD")
   
   //MARK: - set sheet primer information
-  var newTime = new Date(currentDateTime)
+  var newTime = new Date()
   var currentHour = newTime.getHours();
   var currentDay = newTime.getDate();
   var ss = null;
