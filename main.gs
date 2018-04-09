@@ -15,7 +15,7 @@ function doGet(){
   
   //MARK: - if first day of the month, and between 12:00 AM and 5:00AM (allocate an allowance of 5 hours just in case!)
   if ((currentHour >= 5)) {
-    return false;
+    //return false;
   }
   
   //MARK: - start parsing the sheet configuration
@@ -33,6 +33,7 @@ function doGet(){
   
   //MARK: - generate/reuse the sheet
   logger("MAIN_SHEET_INIT: - generating parent spreadsheet")
+  
   // - get sheet title
   var sheetTitle = "MONTHLY REPORT : " + Utilities.formatDate(new Date(currentDateTime), "GMT+9", "yyyy-MM");
   if (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) {

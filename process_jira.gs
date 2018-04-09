@@ -51,7 +51,7 @@ function processJira(projectName, object, sheetObject){
     } else {
       // - include data
       urlParams += "(statusCategory in ('Done') AND resolutiondate >= '" + currentMonthStart + "')))"
-    
+      
     }
     
     // - append the encoded uri
@@ -192,10 +192,16 @@ logger("FETCHING_JIRA_GROUP_NAMES: - processing summary time | " + projectName +
            Moment.moment(issueStartDate).isValid() &&
            (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) &&
            unixIssueStartDate > unixMonthEstimatedEnd
+        ) ||
+        
+        // - if more than the 7th day of the month
+        (
+           issueStartDate != "" &&
+           Moment.moment(issueStartDate).isValid() &&
+           (_CURRENT_DAY_CYCLE > 6) &&
+           unixIssueStartDate <= unixMonthEstimatedEnd
         )
-      ) {
-        continue;
-      }
+      ) { continue; }
       
       //MARK: - push elements
       //MARK: - project name - プロジェクト

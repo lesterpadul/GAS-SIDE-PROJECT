@@ -79,8 +79,10 @@ logger("FETCHING_REDMINE_ISSUE: - end of processing issue name | " + projectName
       // - only include parent issues, and valid brands according ot the struct_brand.gs file
       //yun 02/01
       if (
+        // - if is not parent
         !isParent || 
-
+        
+        // - if issue start date is null
         issueStartDate == null ||
 
         // - check if start date is within the 1st and 6th day of the month
@@ -90,9 +92,15 @@ logger("FETCHING_REDMINE_ISSUE: - end of processing issue name | " + projectName
            (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) &&
            unixIssueStartDate > monthEstimatedEnd
         )
-      ) {
-        continue;
-      }
+        
+        // - if more than the 7th day of the month
+        (
+           issueStartDate != "" &&
+           Moment.moment(issueStartDate).isValid() &&
+           (_CURRENT_DAY_CYCLE > 6) &&
+           unixIssueStartDate <= monthEstimatedEnd
+        )
+      ) { continue; }
       
       //yun 02/02 start
       // - translate to unix
