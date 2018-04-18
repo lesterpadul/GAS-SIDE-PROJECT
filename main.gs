@@ -277,13 +277,22 @@ function generateSpreadsheets() {
     var sheetObject = _SPREADSHEET.getSheetByName(project.project_title);
     _DID_GENERATE_NEW = false;
     
+    // - get sheets
+    var currentSheets = _SPREADSHEET.getSheets();
+    
     // - if has no sheet
     if (sheetObject == null) { 
+      // - insert sheet
       sheetObject = _SPREADSHEET.insertSheet(project.project_title);
+      
+      // - set active sheet
+      _SPREADSHEET.setActiveSheet(sheetObject)
       
       // - set flag for generating new sheet
       _DID_GENERATE_NEW = true;
       
+      // - move active sheet
+      _SPREADSHEET.moveActiveSheet(i + 1);
     }
     
     // - if did not parse the sheet settings
