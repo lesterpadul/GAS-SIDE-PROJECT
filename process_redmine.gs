@@ -28,6 +28,10 @@ function processRedMine(projectName, object, sheetObject){
   // - api key used in jira
   var apiKey = structSpreadsheet.sheet_api_key;
   
+  // - get the start of last month
+  var monthEstimatedStart = Moment.moment(Moment.moment(new Date()).startOf('month').format('YYYY-MM-DD')).unix();
+  var monthEstimatedEnd = Moment.moment(Moment.moment(new Date()).subtract(1,'months').endOf('month')).unix();
+  
   // - setup body content
   while (hasNext) { 
     // - url
@@ -70,26 +74,43 @@ logger("FETCHING_REDMINE_ISSUE: - end of processing issue name | " + projectName
       
       // - if has parent issue
       var isParent = typeof currentIssue.parent != 'undefined' ? false : true
-      
+      var unixIssueStartDate = Moment.moment(issueStartDate).unix();
+
       // - only include parent issues, and valid brands according ot the struct_brand.gs file
       //yun 02/01
-      if (!isParent || issueStartDate == null) {
-        continue;
-      }
+      if (
+        // - if is not parent
+        !isParent || 
+        
+        // - if issue start date is null
+        issueStartDate == null ||
+
+        // - check if start date is within the 1st and 6th day of the month
+        (
+           issueStartDate != null &&
+           Moment.moment(issueStartDate).isValid() &&
+           (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) &&
+           unixIssueStartDate > monthEstimatedEnd
+        ) ||
+        
+        // - if more than the 7th day of the month
+        (
+           issueStartDate != "" &&
+           Moment.moment(issueStartDate).isValid() &&
+           (_CURRENT_DAY_CYCLE > 6) &&
+           unixIssueStartDate <= monthEstimatedEnd
+        )
+      ) { continue; }
       
       //yun 02/02 start
       // - translate to unix
       if (issueDueDate != null) {
-        // - get the start of last month
-        var monthEstimatedStart = Moment.moment(Moment.moment(new Date()).startOf('month').format('YYYY-MM-DD')).unix();
-        
         // - issue due date
         var currentIssueDueDate = Moment.moment(issueDueDate).unix()
         
         // - if within 1st and 6th day
         if (_CURRENT_DAY_CYCLE >= 1 && _CURRENT_DAY_CYCLE <= 6) {
           monthEstimatedStart = Moment.moment(Moment.moment(new Date()).subtract(1,'months').startOf('month')).unix();
-          var monthEstimatedEnd = Moment.moment(Moment.moment(new Date()).subtract(1,'months').endOf('month')).unix();
           
           // - if less than start of this month
           if (currentIssueDueDate < monthEstimatedStart || currentIssueDueDate > monthEstimatedEnd) {
